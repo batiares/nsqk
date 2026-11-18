@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Las eras de NSQK</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="nsqk-version" content="2026-11-18.7">
+<meta name="nsqk-version" content="2026-11-18.8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=EB+Garamond:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap">
@@ -112,7 +112,7 @@ p{margin:0}
 .era{position:relative;--seam:170px;color:var(--fg);background:linear-gradient(var(--prev) 0, var(--bg) var(--seam));background:linear-gradient(in oklch, var(--prev) 0, var(--bg) var(--seam));padding-block:calc(var(--seam) + 4px) clamp(72px,10vw,136px);overflow-x:clip;clip-path:inset(0)}
 .era--botanica{--prev:var(--night);--bg:var(--leaf);--fg:var(--moss);--muted:#4b6244;--line:rgba(27,52,24,.2);--accent:var(--sky);--card:rgba(255,255,255,.38);--vinyl:#4c7a3d;--q:var(--sky)}
 .era--roy{--prev:var(--leaf);--bg:var(--ash);--fg:var(--chalk);--muted:#929189;--line:rgba(232,231,227,.14);--accent:var(--vein);--card:rgba(255,255,255,.045);--vinyl:#0b0b0b;--q:var(--vein)}
-.era--atp{--prev:var(--ash);--bg:var(--tang);--fg:var(--rust);--muted:#4a2106;--line:rgba(26,11,2,.24);--accent:var(--rust);--card:rgba(255,255,255,.16);--vinyl:#1a0b02;--q:var(--rust)}
+.era--atp{--prev:#0a0c1a;--bg:var(--tang);--fg:var(--rust);--muted:#4a2106;--line:rgba(26,11,2,.24);--accent:var(--rust);--card:rgba(255,255,255,.16);--vinyl:#1a0b02;--q:var(--rust)}
 .era--mosca{--prev:var(--tang);--bg:var(--ultra);--fg:var(--milk);--muted:#b7c1ee;--line:rgba(242,239,230,.18);--accent:var(--tongue);--card:rgba(255,255,255,.07);--vinyl:var(--milk);--q:var(--tongue)}
 .era-inner{position:relative;z-index:1}
 .era-top{display:grid;gap:.7rem}
@@ -482,6 +482,51 @@ p{margin:0}
 @media (max-width:900px){.singles-line{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:560px){.singles-line{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.8rem 1.1rem}}
 
+/* ---------- ESPECIAL: la sala de cine ---------- */
+.era--especial{--prev:var(--ash);--bg:#0a0c1a;--fg:#f1ece2;--muted:#a3a7c4;--line:rgba(241,236,226,.15);--accent:#ff8a3d;--card:rgba(255,255,255,.05);--q:#ff8a3d}
+.beam{position:absolute;left:50%;top:0;width:min(1200px,150vw);height:min(900px,62%);transform:translateX(-50%);pointer-events:none;z-index:0;background:linear-gradient(180deg, rgba(255,232,180,.17), rgba(255,232,180,.03) 88%, transparent);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);animation:projector 3.2s steps(6) infinite}
+.beam i{position:absolute;left:var(--x);top:var(--y);width:3px;height:3px;border-radius:50%;background:rgba(255,240,210,.75);animation:dust 8s linear infinite;animation-delay:var(--d)}
+@keyframes projector{0%,100%{opacity:.9}20%{opacity:.72}45%{opacity:.95}70%{opacity:.8}}
+@keyframes dust{0%{transform:translate(0,0);opacity:0}20%{opacity:1}100%{transform:translate(34px,-70px);opacity:0}}
+.era--especial.is-playing .beam{animation-duration:1.2s}
+.esp-top{text-align:center;justify-items:center}
+.esp-title{margin-top:.6rem;max-width:100%}
+.sign{display:inline-block;max-width:100%;box-sizing:border-box;padding:.18em .5em .22em;font-size:clamp(2.1rem,7.4vw,5.6rem);line-height:.95;font-weight:900;font-variation-settings:"wdth" 78,"wght" 900;letter-spacing:.01em;color:#fff3dc;text-shadow:0 0 18px rgba(255,170,90,.55);background:#14112a;border-radius:12px;outline:7px dotted #ffd27a;outline-offset:7px;box-shadow:0 0 0 3px #ff8a3d inset,0 0 60px rgba(255,138,61,.25);animation:bulbs 1.1s steps(2) infinite}
+@keyframes bulbs{50%{outline-color:#ff8a3d}}
+.esp-sub{font-family:var(--display);font-size:clamp(1.2rem,2.6vw,1.8rem);font-weight:700;font-variation-settings:"wdth" 92,"wght" 700;margin-top:1rem}
+.esp-sub span{font-weight:400;color:var(--muted);font-variation-settings:"wdth" 92,"wght" 400}
+.esp-top .era-facts{justify-content:center}
+.cinema{margin-top:clamp(36px,5vw,56px)}
+.screen{position:relative;margin:0 auto;width:min(100%,880px);aspect-ratio:16 / 9;max-width:100%;display:grid;grid-template-columns:56.25% minmax(0,1fr);background:#000;border-radius:6px;overflow:hidden;box-shadow:0 0 0 6px #171a30,0 0 90px rgba(255,214,150,.16),0 44px 80px -30px rgba(0,0,0,.95);transition:box-shadow .5s}
+.era--especial.is-playing .screen{box-shadow:0 0 0 6px #2a2140,0 0 130px rgba(255,190,120,.42),0 44px 80px -30px rgba(0,0,0,.95)}
+.screen img{width:100%;height:100%;object-fit:cover}
+.credits{position:relative;overflow:hidden;-webkit-mask-image:linear-gradient(transparent, #000 18%, #000 82%, transparent);mask-image:linear-gradient(transparent, #000 18%, #000 82%, transparent)}
+.credits-roll{animation:roll 30s linear infinite}
+.roll-part{display:grid;gap:clamp(.4rem,1.4vw,1rem);padding:clamp(1rem,3vw,2rem) .8rem;text-align:center;color:#e9e4f2}
+.roll-part p{line-height:1.25;font-size:clamp(.7rem,1.5vw,1rem)}
+.roll-part .mono{color:#9fa3bf;font-size:clamp(.5rem,1vw,.66rem)}
+.roll-part b{font-family:var(--display);font-weight:800;font-variation-settings:"wdth" 85,"wght" 800;font-size:clamp(.85rem,2vw,1.35rem)}
+.roll-part .end{font-family:"EB Garamond",Georgia,serif;font-style:italic;color:#ffd27a;font-size:clamp(.8rem,1.7vw,1.15rem);padding-block:.6rem 1.2rem}
+@keyframes roll{to{transform:translateY(-50%)}}
+.screen-grain{position:absolute;inset:0;pointer-events:none;background-image:var(--grain);background-size:150px;opacity:.1;mix-blend-mode:screen;animation:grain .5s steps(3) infinite}
+.screen-live{position:absolute;left:.7rem;top:.6rem;display:none;align-items:center;gap:.4rem;padding:.25rem .5rem;border-radius:4px;background:rgba(0,0,0,.6);color:#ffd27a;font-size:.6rem}
+.screen-live::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:#ff3b1f;animation:blink 1.2s steps(2) infinite}
+.era--especial.is-playing .screen-live{display:inline-flex}
+.seats{width:min(100%,960px);height:58px;margin:26px auto 0;background:radial-gradient(ellipse 21px 25px at 50% 100%, #05060f 97%, transparent 100%) 0 100% / 50px 58px repeat-x,radial-gradient(ellipse 21px 25px at 50% 100%, #080a18 97%, transparent 100%) 25px 100% / 50px 40px repeat-x;opacity:.95}
+.esp-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,5vw,72px);margin-top:clamp(36px,5vw,64px);align-items:start}
+.esp-side{display:grid;gap:1rem}
+.subtitle{padding:1rem 1.1rem;background:#000;border-radius:6px;text-align:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.subtitle .mono{color:var(--muted);font-size:.58rem}
+.subtitle p{margin-top:.5rem;font-family:"EB Garamond",Georgia,serif;font-size:clamp(1.2rem,2.2vw,1.55rem);line-height:1.25;color:#ffd27a;text-shadow:0 2px 0 #000}
+.esp-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.esp-pair div{padding:.85rem .9rem;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.esp-pair .mono{color:var(--accent);font-size:.58rem}
+.esp-pair p{margin-top:.35rem;font-size:.93rem;line-height:1.45}
+.esp-chips .chip{font-size:.66rem;padding:.45rem .8rem}
+.esp-side .listen-link{justify-self:start;font-size:.7rem}
+@media (max-width:860px){.esp-grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:480px){.esp-pair{grid-template-columns:minmax(0,1fr)}.sign{outline-width:5px;outline-offset:5px}}
+
 /* ---------- objetos por canción (comunes) ---------- */
 .objs{margin-top:clamp(56px,8vw,96px)}
 .obj-h{color:var(--muted);text-align:center;margin-bottom:1rem}
@@ -675,7 +720,7 @@ html:not(.has-audio) .audio-only{display:none!important}
           <li><span class="y">2021</span><span>Braille, EP en dupla con Méne.</span></li>
           <li class="is-era" style="--c:var(--chalk)"><span class="y">2022</span><span><b>ROY</b>, su primer álbum.</span></li>
           <li><span class="y">2023</span><span>ROY EN VIVO y Festival Ceremonia. Rolling Stone en Español lo llama «la guía hacia el futuro».</span></li>
-          <li class="is-era" style="--c:var(--tang)"><span class="y">2024</span><span>Lollapalooza Chile, <b>ATP</b> y el Alter Ego Tour.</span></li>
+          <li class="is-era" style="--c:var(--tang)"><span class="y">2024</span><span>«Mami 100pre Sabe» con Álvaro Díaz, Lollapalooza Chile, <b>ATP</b> y el Alter Ego Tour.</span></li>
           <li class="is-era" style="--c:#8fa6ff"><span class="y">2026</span><span><b>mosca</b>, su COLORS SHOW y su nombre en el cartel de Camp Flog Gnaw.</span></li>
         </ol>
       </div>
@@ -858,6 +903,54 @@ html:not(.has-audio) .audio-only{display:none!important}
         <figure><img src="img/cuandomevaya.jpg" alt="Portada de Cuando Me Vaya: Nsqk sentado en un sillón de una sala antigua con luz cálida" width="420" height="420" loading="lazy"><figcaption><b>Cuando Me Vaya</b><span class="mono">Sencillo · sep 2022</span><span>El primer adelanto, y la canción más personal del disco.</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="roy:1" aria-label="Escuchar 30 segundos de Cuando Me Vaya">▶ Escuchar</button></span></figcaption></figure>
         <figure><img src="img/corazon.jpg" alt="Portada de Corazón : Classics en rojo, blanco y negro con tipografía grande" width="420" height="420" loading="lazy"><figcaption><b>Corazón : Classics</b><span class="mono">Sencillo · mar 2023</span><span>Con el disco ya afuera, salió por separado con portada propia.</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="roy:8" aria-label="Escuchar 30 segundos de Corazón : Classics">▶ Escuchar</button></span></figcaption></figure>
         <figure><img src="img/royenvivo.jpg" alt="Portada de ROY EN VIVO 2023: retrato en rojo y negro de Nsqk con gorro, tapándose la cara con las manos" width="420" height="420" loading="lazy"><figcaption><b>ROY EN VIVO 2023</b><span class="mono">Álbum en vivo · sep 2023</span><span>17 temas grabados en directo.</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="x:8" aria-label="Escuchar 30 segundos de Cuando Me Vaya en vivo">▶ Cuando me vaya, en vivo</button></span></figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== ESPECIAL: ÁLVARO DÍAZ ====================== -->
+<section class="era era--especial" id="especial" aria-labelledby="t-especial">
+  <div class="beam" aria-hidden="true"><i style="--x:44%;--y:18%;--d:0s"></i><i style="--x:52%;--y:34%;--d:-2s"></i><i style="--x:38%;--y:52%;--d:-4s"></i><i style="--x:60%;--y:61%;--d:-1s"></i><i style="--x:48%;--y:72%;--d:-6s"></i><i style="--x:30%;--y:80%;--d:-3s"></i><i style="--x:68%;--y:84%;--d:-5s"></i></div>
+  <div class="wrap era-inner">
+    <div class="era-top esp-top">
+      <p class="era-index mono">Especial · mayo 2024 · escena post-créditos</p>
+      <h2 class="esp-title" id="t-especial"><span class="sign">MAMI 100PRE SABE</span></h2>
+      <p class="esp-sub">Álvaro Díaz <span>con</span> Nsqk</p>
+      <dl class="era-facts mono">
+        <div><dt>Disco</dt><dd>SAYONARA, de Álvaro Díaz</dd></div>
+        <div><dt>Salida</dt><dd>17 may 2024</dd></div>
+        <div><dt>Lugar</dt><dd>Pista 10 de 20</dd></div>
+        <div><dt>Tipo</dt><dd>Interludio</dd></div>
+        <div><dt>Duración</dt><dd>2:18</dd></div>
+      </dl>
+    </div>
+    <div class="cinema">
+      <div class="screen">
+        <img src="img/sayonara.jpg" alt="Portada de SAYONARA: un parque de diversiones destruido de noche, con un castillo en llamas y Álvaro Díaz de espaldas" width="520" height="520" loading="lazy">
+        <div class="credits" aria-hidden="true"><div class="credits-roll">
+          <div class="roll-part"><p class="mono">Un disco de</p><p><b>Álvaro Díaz</b></p><p class="mono">SAYONARA · pista 10</p><p><b>MAMI 100PRE SABE</b><br>(Interlude)</p><p class="mono">con</p><p><b>Nsqk</b></p><p class="mono">y la voz de</p><p><b>Mami</b></p><p class="mono">17 · 05 · 2024</p><p class="end">Quédate hasta el final.<br>A veces hay una escena nueva.</p></div>
+          <div class="roll-part"><p class="mono">Un disco de</p><p><b>Álvaro Díaz</b></p><p class="mono">SAYONARA · pista 10</p><p><b>MAMI 100PRE SABE</b><br>(Interlude)</p><p class="mono">con</p><p><b>Nsqk</b></p><p class="mono">y la voz de</p><p><b>Mami</b></p><p class="mono">17 · 05 · 2024</p><p class="end">Quédate hasta el final.<br>A veces hay una escena nueva.</p></div>
+        </div></div>
+        <span class="screen-grain" aria-hidden="true"></span>
+        <span class="screen-live mono" aria-hidden="true">En pantalla</span>
+      </div>
+      <div class="seats" aria-hidden="true"></div>
+    </div>
+    <div class="esp-grid">
+      <div class="era-story">
+        <p class="era-lede">Antes de ATP, Nsqk se metió en el disco de un amigo: un interludio de dos minutos en <i>SAYONARA</i>, de Álvaro Díaz.</p>
+        <p>Todo empezó en X: alguien preguntó si Nsqk haría algo con Álvaro Díaz, Nsqk dijo que sí, Álvaro contestó, se juntaron en el estudio y salió la química. Álvaro estaba terminando <i>SAYONARA</i> y quería a Nsqk en el disco sin gastar todavía el featuring completo. Así nació «MAMI 100PRE SABE», que Nsqk coescribió y en la que aparece.</p>
+        <p><i>SAYONARA</i> es un disco sobre decirle adiós a un amor que no se deja ir: una montaña rusa que va de despertar de una pesadilla y darse cuenta de que todo terminó, a la despedida final. La primera mitad es oscura y autodestructiva, y justo a la mitad llega este interludio: la mamá de Álvaro le recuerda que, de niño, se quedaba en el cine hasta el final esperando a ver si aparecía una escena nueva, y que a veces la vida es así. Es la primera luz del disco. Álvaro bromea con que parece un featuring con su mamá.</p>
+        <p>La amistad siguió. En agosto llegó «MUBI», con Álvaro, dentro de ATP (MUBI, por cierto, es el nombre de una plataforma de cine). Álvaro la cantó en los shows de Nsqk y en el Palacio, en una noche en la que se cortó el audio y terminó en un momento intenso y un poco caótico. Nina, por su parte, cantó «los alpes» en un show de Álvaro en Guadalajara.</p>
+      </div>
+      <div class="esp-side">
+        <div class="subtitle"><span class="mono">Lo que le dice su mamá, en resumen</span><p>Quédate hasta el final. A veces hay una escena nueva.</p></div>
+        <div class="esp-pair">
+          <div><span class="mono">Álvaro sobre Nsqk</span><p>Admira que evolucione sin perder su esencia, y que tenga una comunidad que lo respalda para experimentar.</p></div>
+          <div><span class="mono">Nsqk sobre Álvaro</span><p>Un artista que toma riesgos, se aleja de lo esperado y se reinventa en cada proyecto.</p></div>
+        </div>
+        <div class="s-chips esp-chips audio-only"><button class="chip" type="button" data-play="x:9" aria-label="Escuchar 30 segundos de MAMI 100PRE SABE">▶ Mami 100pre Sabe</button><button class="chip" type="button" data-play="atp:10" aria-label="Escuchar 30 segundos de MUBI">▶ MUBI</button></div>
+        <a class="listen-link mono" href="https://music.apple.com/mx/album/sayonara/1742298801" target="_blank" rel="noopener">Escuchar SAYONARA ↗</a>
       </div>
     </div>
   </div>
@@ -1111,6 +1204,9 @@ html:not(.has-audio) .audio-only{display:none!important}
       <li><a href="https://es.rollingstone.com/artistas-que-debes-conocer-nina/" target="_blank" rel="noopener">Rolling Stone en Español: Nina</a></li>
       <li><a href="https://es.rollingstone.com/nsqk-cierra-la-era-de-atp-con-ugh-y-otros-lugares/" target="_blank" rel="noopener">Rolling Stone en Español: UGH y OTROS LUGARES</a></li>
       <li><a href="https://cassinimx.com/nsqk-cuando-me-vaya/" target="_blank" rel="noopener">Cassini MX: Cuando Me Vaya</a></li>
+      <li><a href="https://es.rollingstone.com/musicians-on-musicians-alvaro-diaz-nsqk/" target="_blank" rel="noopener">Rolling Stone en Español: Álvaro Díaz y Nsqk</a></li>
+      <li><a href="https://www.neo2.com/nuestra-critica-sobre-el-nuevo-disco-de-reggaeton-sayonara-de-alvaro-diaz/" target="_blank" rel="noopener">Neo2: reseña de SAYONARA</a></li>
+      <li><a href="https://www.13.cl/programas/entretencion/actualidad/alvaro-diaz-presenta-sayonara-su-tan-esperado-y-aclamado-nuevo" target="_blank" rel="noopener">13.cl: Álvaro Díaz presenta SAYONARA</a></li>
       <li><a href="https://music.apple.com/mx/artist/nsqk/1480741185" target="_blank" rel="noopener">Apple Music: discografía y duraciones</a></li>
     </ol>
     <p class="credits">Hecho por fans, sin fines comerciales. Portadas y arte de sus respectivos dueños (Nsqk, Honey, Worldwide Records, No Pedí Permiso). Foto de 2021 por CapitanTick3, dominio público (CC0), vía Wikimedia Commons. Lo que dice cada canción resume entrevistas, reseñas y análisis publicados; cuando no hay una lectura confiable de la letra, la ficha se queda en los datos.</p>
@@ -1298,14 +1394,15 @@ Object.keys(DATA).forEach(key => {
 /* ---------------- visibilidad, barra y colores ---------------- */
 const nav = $('.eras-nav');
 const navNow = $('#navNow'), navText = $('#navNowText');
-const LABELS = {top: '4 eras · 2020–2026', botanica: 'Era 1 · Botánica · 2020', roy: 'Era 2 · ROY · 2022', atp: 'Era 3 · ATP · 2024', mosca: 'Era 4 · mosca · 2026'};
+const LABELS = {top: '4 eras · 2020–2026', botanica: 'Era 1 · Botánica · 2020', roy: 'Era 2 · ROY · 2022', especial: 'Especial · con Álvaro Díaz · 2024', atp: 'Era 3 · ATP · 2024', mosca: 'Era 4 · mosca · 2026'};
 const eras = $$('.era');
 const THEMES = {
   top: ['#101014', '#eeebe4', '#eeebe4'],
   botanica: ['#dbe5cb', '#1b3418', '#2a5fc4'],
   roy: ['#141414', '#e8e7e3', '#d83b2f'],
   atp: ['#ff6a13', '#1a0b02', '#1a0b02'],
-  mosca: ['#0c2c94', '#f2efe6', '#ff5f9e']
+  mosca: ['#0c2c94', '#f2efe6', '#ff5f9e'],
+  especial: ['#0a0c1a', '#f1ece2', '#ff8a3d']
 };
 const visible = new Set();
 const onToggle = {};
@@ -1548,7 +1645,9 @@ onToggle.botanica = on => {
   const x = c.getContext('2d'), im = x.createImageData(150, 150);
   for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() * 255 | 0; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
   x.putImageData(im, 0, 0);
-  $('#grain').style.backgroundImage = `url(${c.toDataURL()})`;
+  const grainUrl = `url(${c.toDataURL()})`;
+  $('#grain').style.backgroundImage = grainUrl;
+  document.documentElement.style.setProperty('--grain', grainUrl);
 })();
 const rt = $('.roy-title'), ghost = $('.roy-ghost'), royDark = $('#royDark');
 const spot = {x: innerWidth * .7, y: innerHeight * .4, tx: innerWidth * .7, ty: innerHeight * .4, last: -1e9};
@@ -1698,10 +1797,11 @@ const EXTRA = [
   {t: "NADIE MÁS!", c: "sisifo", era: "atp", n: "SÍSIFO / NADIE MÁS! · era ATP", p: "AudioPreview221/v4/a5/31/84/a5318465-3b0e-e2ff-3422-a03b829d6646/mzaf_17932642361279761845.plus.aac.p.m4a"},
   {t: "UGH", c: "ugh", era: "atp", n: "UGH / OTROS LUGARES · era ATP", p: "AudioPreview221/v4/cc/de/39/ccde3934-6476-8899-5168-4445816668ea/mzaf_1643757537027144757.plus.aac.p.m4a"},
   {t: "OTROS LUGARES", c: "ugh", era: "atp", n: "Con DrefQuila · era ATP", p: "AudioPreview211/v4/56/68/45/566845b0-3817-f939-f84d-cdba59a19c54/mzaf_14072462047667821954.plus.aac.p.m4a"},
-  {t: "Cuando Me Vaya (en vivo)", c: "royenvivo", era: "roy", n: "ROY EN VIVO 2023", p: "AudioPreview211/v4/f6/42/59/f64259c1-500b-4cec-e683-9de4d6ff546f/mzaf_14233532229579031419.plus.aac.p.m4a"}
+  {t: "Cuando Me Vaya (en vivo)", c: "royenvivo", era: "roy", n: "ROY EN VIVO 2023", p: "AudioPreview211/v4/f6/42/59/f64259c1-500b-4cec-e683-9de4d6ff546f/mzaf_14233532229579031419.plus.aac.p.m4a"},
+  {t: "MAMI 100PRE SABE (Interlude)", c: "sayonara", era: "especial", n: "Álvaro Díaz con Nsqk · SAYONARA", p: "AudioPreview221/v4/23/42/7a/23427ac7-0e4d-3f70-a532-314dfa1ea382/mzaf_4972376529448714677.plus.aac.p.m4a"}
 ];
 const ALBUM_NAME = {botanica: 'Botánica', roy: 'ROY', atp: 'ATP', mosca: 'mosca'};
-const ALBUM_COLOR = {botanica: '#b9d39c', roy: '#d83b2f', atp: '#ff6a13', mosca: '#ff5f9e'};
+const ALBUM_COLOR = {botanica: '#b9d39c', roy: '#d83b2f', atp: '#ff6a13', mosca: '#ff5f9e', especial: '#ff8a3d'};
 const ICON = {
   play: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>',
   pause: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z" fill="currentColor"/></svg>'
