@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Las eras de NSQK</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=EB+Garamond:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wdth,wght@75..100,400..700&display=swap">
+<style>
+/* Layout: línea de tiempo vertical en cuatro mundos de color. Cada era arranca con el color de la anterior y se transforma en el suyo; una barra fija marca el avance con una mosca. */
+:root{
+  color-scheme: dark;
+  --night:#101014; --bone:#eeebe4; --dust:#9d9a92;
+  --leaf:#dbe5cb; --moss:#1b3418; --sky:#2a5fc4; --slide:#e2ad35;
+  --ash:#141414; --chalk:#e8e7e3; --vein:#d83b2f;
+  --tang:#ff6a13; --rust:#1a0b02; --amber:#ffcf6e; --cabin:#170b04;
+  --ultra:#0c2c94; --milk:#f2efe6; --tongue:#ff5f9e; --spot:#050817;
+  --display:"Archivo","Arial Narrow",Impact,sans-serif;
+  --body:"Instrument Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  --nav-bg:var(--night); --nav-fg:var(--bone); --nav-accent:var(--bone);
+}
+html{scroll-behavior:smooth;scroll-padding-top:3.5rem}
+body{margin:0;background:var(--night);color:var(--bone);font-family:var(--body);font-size:1.0625rem;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--nav-bg)}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;font-weight:800}
+p{margin:0}
+:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.wrap{max-width:1180px;margin-inline:auto;padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));box-sizing:border-box}
+.mono{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;line-height:1.4}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;overflow:hidden;padding-block:clamp(28px,5vw,56px) clamp(48px,7vw,96px)}
+.hero-meta{color:var(--dust)}
+.wordmark{display:flex;white-space:nowrap;font-size:clamp(5rem,23vw,17rem);line-height:.8;letter-spacing:-.01em;margin-top:.12em;font-weight:800;font-variation-settings:"wdth" 100,"wght" 800}
+.wordmark span{display:inline-block}
+.hero-row{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,5vw,72px);align-items:center;margin-top:clamp(24px,3.5vw,48px)}
+.say{color:var(--dust)}
+.say b{color:var(--bone);font-weight:500;letter-spacing:.14em}
+.lede{font-size:clamp(1.125rem,1.7vw,1.32rem);line-height:1.5;max-width:34rem;margin-top:.8rem}
+.lede em{font-style:normal;font-weight:600}
+.scroll-cue{display:inline-flex;align-items:center;gap:.6rem;margin-top:1.8rem;color:var(--dust)}
+.scroll-cue span{display:inline-block;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(5px)}}
+.deck{position:relative;width:min(100%,400px);aspect-ratio:1;max-width:100%;margin-inline:auto;perspective:1100px;--rx:0deg;--ry:0deg}
+.deck-inner{position:absolute;inset:0;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;transition:transform .45s ease-out}
+.deck-card{position:absolute;inset:9%;z-index:var(--z);--tx:calc(var(--o) * 12%);--ty:0%;--rot:calc(var(--o) * 6deg);transform:translateX(var(--tx)) translateY(var(--ty)) rotate(var(--rot));transition:transform .6s cubic-bezier(.2,.8,.2,1);box-shadow:0 22px 44px -12px rgba(0,0,0,.7);border-radius:3px;overflow:hidden}
+.deck-card img{width:100%;height:100%;object-fit:cover}
+.deck:hover .deck-card{--tx:calc(var(--o) * 27%);--rot:calc(var(--o) * 8deg);--ty:calc(var(--a) * 5%)}
+.deck .deck-card:hover{--ty:-7%}
+.deck-hint{text-align:center;color:var(--dust);margin-top:.9rem}
+.fly{position:absolute;left:0;top:0;width:30px;height:30px;margin:-15px 0 0 -15px;pointer-events:none;z-index:5;will-change:transform}
+.fly svg{display:block;overflow:visible}
+.fly .wings{transform-origin:15px 14px;animation:flap .045s linear infinite alternate}
+.fly.landed .wings{animation:none;transform:scaleX(.5)}
+@keyframes flap{from{transform:scaleX(1)}to{transform:scaleX(.3)}}
+@media (max-width:820px){
+  .hero-row{grid-template-columns:minmax(0,1fr)}
+  .deck{width:min(78%,360px)}
+  .deck:hover .deck-card{--tx:calc(var(--o) * 15%)}
+}
+
+/* ---------- NAV ---------- */
+.eras-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--nav-bg);color:var(--nav-fg);transition:background-color .6s,color .6s}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:2.75rem}
+.nav-mark{font-family:var(--display);font-weight:900;font-variation-settings:"wdth" 125,"wght" 900;font-size:1.05rem;letter-spacing:.02em}
+.nav-now{display:inline-flex;align-items:center;gap:.6rem;font-size:.7rem;overflow:hidden}
+.nav-now .sw{width:.6rem;height:.6rem;border-radius:50%;background:var(--nav-accent);transition:background-color .6s;flex:none}
+.nav-now span{display:inline-block}
+.nav-now.swap span{animation:navSwap .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes navSwap{from{transform:translateY(80%);opacity:.15}}
+.nav-progress{position:relative;height:3px;background:color-mix(in srgb, var(--nav-fg) 18%, transparent)}
+.nav-progress .bar{position:absolute;left:0;top:0;bottom:0;width:calc(var(--p,0) * 100%);background:var(--nav-accent)}
+.nav-fly{position:absolute;top:50%;left:calc(var(--p,0) * 100%);width:18px;height:18px;transform:translate(-50%,-50%) rotate(90deg);color:var(--nav-fg)}
+
+/* ---------- BIO ---------- */
+.bio{padding-block:clamp(64px,9vw,120px)}
+.bio-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,5vw,80px);align-items:start}
+.photo{margin:0;position:relative}
+.photo img{width:100%;aspect-ratio:1;object-fit:cover;filter:saturate(.92) contrast(1.04)}
+.photo figcaption{margin-top:.7rem;color:var(--dust)}
+.kicker{color:var(--dust)}
+.h-sec{font-size:clamp(2.2rem,5vw,3.6rem);line-height:.98;font-variation-settings:"wdth" 75,"wght" 800;margin-top:.45rem}
+.prose{display:grid;gap:1rem;max-width:62ch;margin-top:1.25rem}
+.quote{position:relative;margin:.4rem 0 0;padding-left:1.15em;font-family:var(--display);font-size:clamp(1.3rem,2.3vw,1.7rem);line-height:1.18;font-weight:700;font-variation-settings:"wdth" 82,"wght" 700}
+.quote::before{content:"«";position:absolute;left:0;top:-.08em;font-size:1.3em;line-height:1;color:var(--q, var(--dust))}
+.quote cite{display:block;margin-top:.55rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-style:normal;font-weight:400;font-variation-settings:normal;opacity:.75}
+.timeline{list-style:none;padding:0;margin:2rem 0 0;border-top:1px solid rgba(238,235,228,.14)}
+.timeline li{display:grid;grid-template-columns:4.25rem minmax(0,1fr);gap:1rem;padding:.6rem 0;border-bottom:1px solid rgba(238,235,228,.14);font-size:.97rem}
+.timeline .y{font-family:var(--mono);font-size:.85rem;color:var(--dust);font-variant-numeric:tabular-nums;padding-top:.08rem}
+.timeline li.is-era .y{color:var(--c);font-weight:500}
+.timeline li.is-era b{font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(238,235,228,.14);border:1px solid rgba(238,235,228,.14);margin-top:clamp(48px,7vw,88px)}
+.stat{background:var(--night);padding:1.3rem 1.2rem 1.2rem}
+.stat b{display:block;font-family:var(--display);font-size:clamp(2.2rem,4.4vw,3.4rem);line-height:1;font-variation-settings:"wdth" 112,"wght" 800;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:.45rem;color:var(--dust);font-size:.9rem;line-height:1.35}
+@media (max-width:820px){.bio-grid{grid-template-columns:minmax(0,1fr)}.photo{max-width:420px}}
+@media (max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- ERAS (común) ---------- */
+.era{position:relative;--seam:170px;color:var(--fg);background:linear-gradient(var(--prev) 0, var(--bg) var(--seam));background:linear-gradient(in oklch, var(--prev) 0, var(--bg) var(--seam));padding-block:calc(var(--seam) + 4px) clamp(72px,10vw,136px);overflow-x:clip;clip-path:inset(0)}
+.era--botanica{--prev:var(--night);--bg:var(--leaf);--fg:var(--moss);--muted:#4b6244;--line:rgba(27,52,24,.2);--accent:var(--sky);--card:rgba(255,255,255,.38);--vinyl:#4c7a3d;--q:var(--sky)}
+.era--roy{--prev:var(--leaf);--bg:var(--ash);--fg:var(--chalk);--muted:#929189;--line:rgba(232,231,227,.14);--accent:var(--vein);--card:rgba(255,255,255,.045);--vinyl:#0b0b0b;--q:var(--vein)}
+.era--atp{--prev:var(--ash);--bg:var(--tang);--fg:var(--rust);--muted:#4a2106;--line:rgba(26,11,2,.24);--accent:var(--rust);--card:rgba(255,255,255,.16);--vinyl:#1a0b02;--q:var(--rust)}
+.era--mosca{--prev:var(--tang);--bg:var(--ultra);--fg:var(--milk);--muted:#b7c1ee;--line:rgba(242,239,230,.18);--accent:var(--tongue);--card:rgba(255,255,255,.07);--vinyl:var(--milk);--q:var(--tongue)}
+.era-inner{position:relative;z-index:1}
+.era-top{display:grid;gap:.7rem}
+.era-index{color:var(--muted)}
+.era-title{font-size:clamp(4.25rem,16vw,12.5rem);line-height:.82;letter-spacing:-.02em}
+.era-facts{display:flex;flex-wrap:wrap;gap:.6rem 2.2rem;margin:.6rem 0 0}
+.era-facts div{display:grid;gap:.12rem}
+.era-facts dt{color:var(--muted)}
+.era-facts dd{margin:0;font-family:var(--mono);font-size:.85rem;letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.era-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(36px,6vw,96px);margin-top:clamp(40px,6vw,72px);align-items:start}
+.era-story{display:grid;gap:1rem;max-width:62ch}
+.era-lede{font-family:var(--display);font-size:clamp(1.45rem,2.5vw,1.95rem);line-height:1.14;font-weight:650;font-variation-settings:"wdth" 86,"wght" 650}
+.era-story em{font-style:italic}
+@media (max-width:880px){.era-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* portada + vinilo */
+.sleeve-wrap{margin:0}
+.sleeve{position:relative;width:72%;aspect-ratio:1;max-width:100%;perspective:1100px;--rx:0deg;--ry:0deg}
+.sleeve-3d{position:absolute;inset:0;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;transition:transform .4s ease-out}
+.vinyl{position:absolute;top:3%;left:3%;width:94%;height:94%;--out:24%;transform:translateX(var(--out));transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.is-in .vinyl{--out:40%}
+.sleeve:hover .vinyl{--out:50%}
+.disc{position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,.07) 0 1px, transparent 1px 4px),radial-gradient(circle at 50% 50%, transparent 0 30%, rgba(0,0,0,.25) 30.5%, transparent 32%),var(--vinyl);box-shadow:0 14px 34px -8px rgba(0,0,0,.55);animation:spin 5.5s linear infinite;animation-play-state:paused}
+.is-in .disc{animation-play-state:running}
+.disc .label{position:absolute;inset:33%;border-radius:50%;background-size:cover;background-position:center;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+.disc::after{content:"";position:absolute;inset:48.6%;border-radius:50%;background:#111}
+.vinyl::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 20deg, rgba(255,255,255,.2), transparent 10%, transparent 48%, rgba(255,255,255,.13) 58%, transparent 70%);pointer-events:none}
+.era--mosca .disc{background:radial-gradient(circle at 22% 30%, var(--spot) 0 4%, transparent 4.5%),radial-gradient(circle at 70% 18%, var(--spot) 0 3%, transparent 3.5%),radial-gradient(circle at 80% 64%, var(--spot) 0 5%, transparent 5.5%),radial-gradient(circle at 34% 78%, var(--spot) 0 3.5%, transparent 4%),radial-gradient(circle at 12% 58%, var(--spot) 0 2.5%, transparent 3%),radial-gradient(circle at 56% 88%, var(--spot) 0 2.5%, transparent 3%),repeating-radial-gradient(circle at 50% 50%, rgba(0,0,0,.06) 0 1px, transparent 1px 4px),var(--vinyl)}
+.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:translateZ(24px);box-shadow:0 26px 52px -14px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.08)}
+.sleeve-wrap figcaption{margin-top:1.1rem;color:var(--muted);font-size:.92rem;max-width:30rem;line-height:1.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* canciones */
+.tracks{margin-top:clamp(56px,8vw,104px);container-type:inline-size}
+.tracks-head{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem 1.5rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.tracks-head h3{font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1;font-variation-settings:"wdth" 78,"wght" 800}
+.tracks-head .meta{display:flex;gap:1rem;align-items:baseline;color:var(--muted);flex-wrap:wrap}
+.listen-link{color:var(--fg);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:1px}
+.listen-link:hover{color:var(--accent)}
+.tracklist{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.trk{display:grid;grid-template-columns:3rem minmax(0,15rem) minmax(0,1fr) 3.5rem;gap:.3rem 1.5rem;padding:1rem .6rem;border-bottom:1px solid var(--line);align-items:baseline;transition:background-color .25s}
+.trk:hover{background:var(--card)}
+.trk-n{position:relative;font-family:var(--mono);font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.trk-n .num{display:inline-block;transition:color .2s,transform .3s cubic-bezier(.2,.8,.2,1)}
+.trk-t .t{font-weight:650;font-size:1.06rem;line-height:1.3}
+.trk-t .feat{display:block;font-size:.86rem;color:var(--muted);margin-top:.1rem}
+.trk-x{font-size:.97rem;line-height:1.55}
+.trk-d{font-family:var(--mono);font-size:.82rem;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:.02rem .34rem;margin-left:.45rem;vertical-align:.18em;color:var(--accent);white-space:nowrap}
+.trk-t .t{transition:color .2s}
+.trk:hover .num{color:var(--accent);transform:translateX(4px)}
+.trk:hover .t{color:var(--accent)}
+@container (max-width:720px){
+  .trk{grid-template-columns:2.4rem minmax(0,1fr) auto;padding-inline:.25rem}
+  .trk-x{grid-column:2 / -1;grid-row:2}
+}
+
+/* alrededor de la era */
+.around{margin-top:clamp(56px,7vw,88px)}
+.around h3{font-size:clamp(1.4rem,2.6vw,1.9rem);line-height:1.05;font-variation-settings:"wdth" 80,"wght" 750}
+.around .sub{color:var(--muted);margin-top:.4rem;max-width:60ch;font-size:.97rem}
+.around-grid{display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));gap:clamp(12px,2.2vw,28px);margin-top:1.3rem}
+.around figure{margin:0}
+.around img{width:100%;aspect-ratio:1;object-fit:cover;box-shadow:0 14px 28px -12px rgba(0,0,0,.6);transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.around figure:nth-child(odd):hover img{transform:translateY(-8px) rotate(-2deg)}
+.around figure:nth-child(even):hover img{transform:translateY(-8px) rotate(2deg)}
+.around figcaption{margin-top:.7rem;font-size:.92rem;line-height:1.4}
+.around figcaption b{display:block;font-weight:650}
+.around figcaption .mono{display:block;color:var(--muted);margin-top:.2rem;font-size:.66rem}
+.around figcaption span:last-child{display:block;margin-top:.3rem}
+@media (max-width:760px){.around-grid.c4{--cols:2}}
+.aside-card{display:grid;grid-template-columns:96px minmax(0,1fr);gap:1rem;align-items:center;padding:.85rem;border:1px solid var(--line);border-radius:10px;background:var(--card);margin-top:.4rem}
+.aside-card img{width:96px;height:96px;object-fit:cover}
+.aside-card p{font-size:.94rem;line-height:1.5}
+.aside-card .mono{color:var(--muted);display:block;margin-bottom:.2rem;font-size:.66rem}
+
+/* ---------- BOTÁNICA ---------- */
+.botanica-title{font-weight:300;font-variation-settings:"wdth" 125,"wght" 300;letter-spacing:-.03em}
+.is-in .botanica-title{animation:sprout 1.6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes sprout{from{font-variation-settings:"wdth" 62,"wght" 700}}
+.era--botanica .cover{transform:translateZ(24px) rotate(-2deg)}
+.era--botanica .sleeve:hover .cover{transform:translateZ(24px) rotate(0deg)}
+.era--botanica .cover{transition:transform .5s ease}
+.fx{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0}
+
+/* ---------- ROY ---------- */
+.roy-title{font-size:clamp(6rem,30vw,21rem);line-height:.92;padding-top:.03em;font-weight:900;font-variation-settings:"wdth" 62,"wght" 900;letter-spacing:.01em;color:var(--chalk);background:url("img/roy.jpg") var(--bx,52%) var(--by,38%) / 130% auto no-repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:1px rgba(232,231,227,.28);transition:background-position .7s ease-out;width:max-content;max-width:100%}
+.is-in .roy-title{animation:tighten 1.4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes tighten{from{letter-spacing:.18em}}
+/* foto fantasma con linterna */
+.roy-dark{position:fixed;inset:0;z-index:0;pointer-events:none;background:url("img/roy.jpg") 72% 30% / cover no-repeat;filter:grayscale(1) contrast(1.2) brightness(.42);-webkit-mask-image:radial-gradient(circle 360px at var(--mx,72%) var(--my,40%), #000 0%, rgba(0,0,0,.55) 42%, rgba(0,0,0,.08) 100%);mask-image:radial-gradient(circle 360px at var(--mx,72%) var(--my,40%), #000 0%, rgba(0,0,0,.55) 42%, rgba(0,0,0,.08) 100%)}
+/* título con registro corrido + los tres nombres */
+.roy-head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:1.5rem clamp(28px,6vw,96px)}
+.roy-word{position:relative;display:inline-block;max-width:100%}
+.roy-ghost{position:absolute;left:0;top:0;font-family:var(--display);font-size:clamp(6rem,30vw,21rem);line-height:.92;padding-top:.03em;font-weight:900;font-variation-settings:"wdth" 62,"wght" 900;letter-spacing:.01em;color:transparent;-webkit-text-stroke:2px var(--vein);transform:translate(var(--gx,12px),var(--gy,9px));transition:transform .6s ease-out;pointer-events:none;white-space:nowrap}
+.is-in .roy-ghost{animation:tighten 1.4s cubic-bezier(.2,.8,.2,1) both}
+.alias-wrap{padding-bottom:.8rem}
+.alias{list-style:none;margin:0;padding:0 0 0 1.2rem;border-left:1px solid rgba(232,231,227,.22)}
+.alias li{position:relative;display:grid;gap:.12rem}
+.alias li::before{content:"";position:absolute;left:calc(-1.2rem - 4px);top:.4rem;width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.alias li.is-roy{margin-top:.55rem}
+.alias li.is-roy + li{margin-top:2.8rem}
+.alias b{font-family:var(--display);font-size:clamp(1.35rem,2.4vw,1.85rem);line-height:1;font-weight:750;font-variation-settings:"wdth" 80,"wght" 750}
+.alias .mono{color:var(--muted);font-size:.6rem}
+.alias .is-roy b{color:var(--vein)}
+.alias .is-roy::before{background:var(--vein);box-shadow:0 0 0 4px rgba(216,59,47,.25)}
+.alias-note{margin-top:.9rem;font-size:.82rem;line-height:1.4;color:var(--muted);max-width:15rem}
+/* cintas cruzadas */
+.roy-bands{position:relative;z-index:1;height:clamp(150px,17vw,230px);margin-top:clamp(28px,5vw,56px)}
+.band{position:absolute;left:-10%;width:120%;top:50%;overflow:hidden;padding-block:.55rem}
+.band--a{background:var(--vein);color:#0d0d0d;transform:translateY(-50%) rotate(-3deg);z-index:2;box-shadow:0 12px 30px rgba(0,0,0,.55)}
+.band--b{background:#0b0b0b;color:transparent;-webkit-text-stroke:1px rgba(232,231,227,.8);transform:translateY(-50%) rotate(2.4deg);border-block:1px solid rgba(232,231,227,.2)}
+.band-track{display:flex;width:max-content;animation:marq 46s linear infinite}
+.band--b .band-track{animation-direction:reverse;animation-duration:70s}
+.band span{flex:none;font-family:var(--display);font-weight:900;font-variation-settings:"wdth" 62,"wght" 900;font-size:clamp(1.7rem,4.2vw,3.2rem);line-height:1;letter-spacing:.02em;white-space:nowrap;padding-right:.4em}
+@keyframes marq{to{transform:translateX(-50%)}}
+/* portada pegada con cinta + sello */
+.tape{position:absolute;z-index:3;height:9%;width:30%;background:rgba(236,233,226,.55);box-shadow:0 2px 6px rgba(0,0,0,.35);clip-path:polygon(0 12%,4% 0,96% 4%,100% 18%,97% 52%,100% 86%,95% 100%,4% 96%,0 84%,3% 50%);transform:translateZ(32px) rotate(var(--r))}
+.tape--l{top:-3%;left:-7%;--r:-34deg}
+.tape--r{top:-3.5%;right:12%;--r:6deg}
+.era--roy .sleeve-wrap figcaption{margin-top:2.2rem}
+.stamp{position:absolute;left:-8%;bottom:-4%;width:32%;height:auto;color:var(--vein);transform:translateZ(40px);z-index:4;filter:drop-shadow(0 4px 10px rgba(0,0,0,.55))}
+.stamp g{transform-origin:60px 60px;animation:spin 26s linear infinite}
+.era--roy .sleeve{margin-top:1rem}
+/* frase subrayada */
+.era--roy .quote{font-size:clamp(1.6rem,3vw,2.35rem);line-height:1.04;text-transform:uppercase;font-weight:850;font-variation-settings:"wdth" 62,"wght" 850;letter-spacing:.01em}
+.era--roy .quote mark{background:var(--vein);color:#0d0d0d;padding:0 .12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+/* notas del disco */
+.liner{position:relative;border:1px dashed rgba(232,231,227,.32);border-radius:4px;padding:1.1rem 1.15rem 1.05rem;background:rgba(255,255,255,.03)}
+.liner::before{content:"";position:absolute;left:12px;right:12px;top:-5px;height:9px;background:radial-gradient(circle, var(--ash) 2.5px, transparent 3px) 0 0 / 14px 9px repeat-x}
+.liner-h{color:var(--vein);margin-bottom:.8rem}
+.liner dl{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem 1.5rem}
+.liner dt{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.liner dd{margin:.15rem 0 0;font-size:.93rem;line-height:1.35}
+@media (max-width:520px){.liner dl{grid-template-columns:minmax(0,1fr)}}
+/* números de pista en contorno */
+.era--roy .trk-n .num{font-family:var(--display);font-size:1.6rem;line-height:.9;font-weight:800;font-variation-settings:"wdth" 62,"wght" 800;color:transparent;-webkit-text-stroke:1px var(--muted)}
+.era--roy .trk:hover .num{color:var(--vein);-webkit-text-stroke-color:var(--vein)}
+.grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:0;opacity:.075;background-size:150px 150px;animation:grain .7s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,3%)}100%{transform:translate(0,0)}}
+.era--roy .around-grid{--cols:3}
+
+/* ---------- ATP ---------- */
+.atp-title{font-weight:900;font-variation-settings:"wdth" 125,"wght" 900;letter-spacing:-.01em}
+.is-in .atp-title{animation:signal 1.1s steps(1) both}
+@keyframes signal{0%{text-shadow:8px 0 0 rgba(255,255,255,.55),-8px 0 0 rgba(26,11,2,.3);transform:skewX(-6deg)}15%{text-shadow:-5px 0 0 rgba(255,255,255,.5),5px 0 0 rgba(26,11,2,.3);transform:skewX(4deg)}30%{text-shadow:3px 0 0 rgba(255,255,255,.4);transform:none}45%{text-shadow:-2px 0 0 rgba(255,255,255,.3)}60%,100%{text-shadow:none;transform:none}}
+.atp-sub{font-family:var(--display);font-size:clamp(1.3rem,3vw,2.1rem);font-variation-settings:"wdth" 110,"wght" 500;line-height:1}
+.numbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:.4rem}
+.numbers div{background:var(--tang);padding:.9rem .9rem .8rem}
+.numbers b{display:block;font-family:var(--display);font-size:clamp(1.6rem,3vw,2.2rem);line-height:1;font-variation-settings:"wdth" 110,"wght" 850;font-variant-numeric:tabular-nums}
+.numbers span{display:block;font-size:.82rem;line-height:1.35;margin-top:.35rem;color:var(--muted)}
+.program{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,4vw,56px);align-items:start;margin-top:clamp(56px,8vw,104px)}
+.program .tracks{margin-top:0}
+.radio{position:sticky;top:4.25rem;background:var(--cabin);color:var(--amber);border-radius:18px;padding:1.2rem;box-shadow:0 34px 60px -24px rgba(26,11,2,.75),inset 0 1px 0 rgba(255,255,255,.07)}
+.radio-top{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.radio-brand{font-family:var(--display);font-weight:900;font-variation-settings:"wdth" 125,"wght" 900;font-size:1.05rem;letter-spacing:.03em;color:var(--tang)}
+.radio-brand b{color:var(--amber)}
+.onair{display:inline-flex;align-items:center;gap:.45rem;color:var(--amber);font-size:.66rem}
+.onair::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:#ff3b1f;box-shadow:0 0 8px #ff3b1f;animation:blink 1.4s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.lcd{position:relative;margin-top:1rem;background:#2b1405;border-radius:10px;padding:1rem 1rem .95rem;min-height:8.2rem;overflow:hidden;box-shadow:inset 0 2px 12px rgba(0,0,0,.65)}
+.lcd canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .15s;image-rendering:pixelated}
+.lcd.is-static canvas{opacity:.85}
+.lcd::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,.2) 2px 3px);pointer-events:none}
+.lcd-text{position:relative}
+.lcd-num{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,207,110,.72)}
+.lcd-title{font-family:var(--display);font-weight:800;font-variation-settings:"wdth" 96,"wght" 800;font-size:clamp(1.45rem,2.6vw,1.95rem);line-height:1.05;color:var(--amber);text-shadow:0 0 14px rgba(255,207,110,.35);margin-top:.35rem;overflow-wrap:anywhere}
+.lcd-sub{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;margin-top:.45rem;color:rgba(255,207,110,.78)}
+.dial{position:relative;margin-top:1.15rem;padding-top:1.5rem}
+.ticks{position:absolute;left:2px;right:2px;top:0;height:1.3rem;display:flex;justify-content:space-between;pointer-events:none}
+.ticks i{width:2px;height:100%;background:rgba(255,207,110,.55)}
+.ticks i.s{height:45%;align-self:flex-end;background:rgba(255,207,110,.28)}
+.dial-ends{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.62rem;color:rgba(255,207,110,.55);letter-spacing:.08em;margin-top:.15rem}
+#tuner{-webkit-appearance:none;appearance:none;display:block;width:100%;height:2.4rem;background:transparent;margin:0;cursor:ew-resize}
+#tuner::-webkit-slider-runnable-track{height:4px;background:rgba(255,207,110,.25);border-radius:2px}
+#tuner::-webkit-slider-thumb{-webkit-appearance:none;width:6px;height:2.6rem;margin-top:calc(-1.3rem + 2px);background:var(--tang);border-radius:3px;box-shadow:0 0 14px rgba(255,106,19,.9)}
+#tuner::-moz-range-track{height:4px;background:rgba(255,207,110,.25);border-radius:2px}
+#tuner::-moz-range-thumb{width:6px;height:2.6rem;border:0;background:var(--tang);border-radius:3px;box-shadow:0 0 14px rgba(255,106,19,.9)}
+#tuner:focus-visible{outline:2px solid var(--amber);outline-offset:4px;border-radius:4px}
+.radio-note{margin-top:1rem;color:#f6dcb0;font-size:.95rem;line-height:1.55;min-height:6.3em}
+.radio-ctrl{display:flex;gap:.5rem;margin-top:1rem}
+.radio-ctrl button{flex:1;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.65rem .5rem;border-radius:8px;border:1px solid rgba(255,207,110,.3);background:rgba(255,207,110,.06);color:var(--amber);cursor:pointer;transition:background-color .2s}
+.radio-ctrl button:hover{background:rgba(255,207,110,.16)}
+.grille{height:3rem;margin-top:1rem;border-radius:8px;background-image:radial-gradient(circle, rgba(255,207,110,.22) 1.2px, transparent 1.7px);background-size:9px 9px}
+.preset{font-family:var(--mono);font-size:.78rem;width:2.3rem;padding:.28rem 0;border-radius:6px;border:1px solid var(--line);background:rgba(255,255,255,.2);color:var(--fg);cursor:pointer;transition:background-color .2s,color .2s,transform .1s;font-variant-numeric:tabular-nums}
+.preset:hover{background:rgba(255,255,255,.4)}
+.preset:active{transform:translateY(1px)}
+.trk.is-on{background:rgba(26,11,2,.1)}
+.trk.is-on .preset{background:var(--rust);color:var(--tang);border-color:var(--rust)}
+.trk.is-skit .t{font-style:italic;font-weight:550}
+.radio-hint{color:var(--muted);margin-top:-.4rem;margin-bottom:1rem;font-size:.95rem}
+@media (max-width:960px){.program{grid-template-columns:minmax(0,1fr)}.radio{position:relative;top:auto}}
+
+/* ---------- MOSCA ---------- */
+.mosca-title{font-weight:900;font-variation-settings:"wdth" 62,"wght" 900;display:flex;white-space:nowrap}
+.mosca-title span{display:inline-block;animation:morph 3.4s cubic-bezier(.65,0,.35,1) infinite alternate;animation-delay:calc(var(--i) * -.5s)}
+@keyframes morph{0%{font-variation-settings:"wdth" 62,"wght" 900}100%{font-variation-settings:"wdth" 125,"wght" 160}}
+.now{display:inline-flex;align-items:center;gap:.45rem;color:var(--tongue)}
+.now::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--tongue);animation:blink 1.6s steps(2) infinite}
+.bookends{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:1rem;margin-top:.4rem;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.bookends .b{display:grid;gap:.15rem}
+.bookends .b:last-child{text-align:right}
+.bookends .bn{font-family:var(--display);font-size:clamp(1.4rem,2.6vw,1.9rem);line-height:1;font-weight:800;font-variation-settings:"wdth" 108,"wght" 800}
+.bookends .mono{color:var(--muted);font-size:.64rem}
+.bookends small{font-size:.86rem;color:var(--fg)}
+.bookends .arrow{font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tongue);text-align:center}
+.bookends .arrow svg{display:block;margin:0 auto .2rem}
+.shoo{color:var(--muted)}
+
+/* ---------- CIERRE ---------- */
+.outro{background:linear-gradient(var(--ultra) 0, var(--night) 170px);background:linear-gradient(in oklch, var(--ultra) 0, var(--night) 170px);padding-block:calc(170px + 4px) 56px}
+.listen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2.2vw,28px);margin-top:2rem}
+.listen-card{display:grid;gap:.6rem;align-content:start}
+.listen-card img{width:100%;aspect-ratio:1;object-fit:cover;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.listen-card:hover img{transform:translateY(-6px)}
+.listen-card h3{font-size:1.3rem;font-variation-settings:"wdth" 90,"wght" 800}
+.listen-card .mono{color:var(--dust);font-size:.66rem}
+.links{display:flex;flex-wrap:wrap;gap:.4rem}
+.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.42rem .75rem;border-radius:999px;border:1px solid rgba(238,235,228,.26);text-decoration:none;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;transition:background-color .2s,color .2s}
+.btn:hover{background:var(--bone);color:var(--night)}
+.sources-h{margin-top:clamp(56px,7vw,88px);font-size:1.4rem;font-variation-settings:"wdth" 85,"wght" 750}
+.sources{columns:2 20rem;column-gap:2.5rem;margin:1rem 0 0;padding-left:1.15rem;color:var(--dust);font-size:.9rem}
+.sources li{break-inside:avoid;margin-bottom:.4rem}
+.sources a{color:var(--bone);text-decoration-color:rgba(238,235,228,.35);text-underline-offset:2px}
+.credits{color:var(--dust);font-size:.85rem;margin-top:2.5rem;border-top:1px solid rgba(238,235,228,.12);padding-top:1.25rem;max-width:80ch}
+@media (max-width:760px){.listen{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- ATP: decoración ---------- */
+.atp-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.5rem 3rem}
+.atp-word{position:relative;isolation:isolate}
+.waves{position:absolute;left:30%;top:42%;width:0;height:0;z-index:-1;pointer-events:none}
+.waves i{position:absolute;left:-320px;top:-320px;width:640px;height:640px;border-radius:50%;border:2px solid rgba(26,11,2,.2);transform:scale(.12);opacity:0;animation:wave 5.2s linear infinite}
+.waves i:nth-child(2){animation-delay:-1.3s}.waves i:nth-child(3){animation-delay:-2.6s}.waves i:nth-child(4){animation-delay:-3.9s}
+@keyframes wave{0%{transform:scale(.12);opacity:0}12%{opacity:1}100%{transform:scale(1);opacity:0}}
+#atp.on-air .waves i{animation-duration:2.2s;border-color:rgba(26,11,2,.32)}
+.molecule{margin:0;width:min(100%,440px);color:var(--rust)}
+.molecule svg{display:block;width:100%;height:auto;overflow:visible}
+.molecule .lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;fill:var(--muted)}
+.molecule .word{font-family:var(--display);font-weight:800;font-size:19px;fill:var(--rust)}
+.molecule .pc{fill:var(--rust)}
+.molecule .pt{font-family:var(--display);font-weight:900;font-size:17px;fill:var(--amber)}
+.molecule .p3{animation:release 3.4s ease-in-out infinite}
+.molecule .sq-hot{animation:hot 3.4s ease-in-out infinite}
+.molecule .spark{opacity:0;animation:spark 3.4s ease-out infinite}
+@keyframes release{0%,52%,100%{transform:translateX(0)}62%,82%{transform:translateX(16px)}}
+@keyframes hot{0%,52%,100%{opacity:1}60%,84%{opacity:.1}}
+@keyframes spark{0%,54%{opacity:0;transform:scale(.6)}62%{opacity:1;transform:scale(1)}78%,100%{opacity:0;transform:scale(1.3)}}
+.molecule .spark{transform-origin:348px 62px;transform-box:view-box}
+.molecule .o{font-family:var(--display);font-weight:700;font-size:13px;fill:var(--rust)}
+.molecule figcaption{font-size:.85rem;line-height:1.45;color:var(--muted);margin-top:.4rem;max-width:30rem}
+.led{position:relative;z-index:1;margin-top:clamp(36px,5vw,60px);background:#120802;border-block:3px solid var(--rust);padding-block:.75rem;overflow:hidden;box-shadow:inset 0 0 34px rgba(0,0,0,.85)}
+.led-track{display:flex;width:max-content;animation:marq 40s linear infinite}
+.led span{flex:none;font-family:var(--mono);font-weight:500;font-size:clamp(1.15rem,2.5vw,1.85rem);letter-spacing:.14em;text-transform:uppercase;color:var(--amber);text-shadow:0 0 8px rgba(255,180,60,.85),0 0 22px rgba(255,120,20,.45);white-space:nowrap;padding-right:1.4em}
+.led::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg, rgba(18,8,2,.78) 1px, transparent 1px) 0 0 / 4px 4px,linear-gradient(rgba(18,8,2,.78) 1px, transparent 1px) 0 0 / 4px 4px}
+.sticker{position:absolute;z-index:4;transform:translateZ(38px) rotate(var(--r));border:3px solid #fff8ee;box-shadow:0 6px 14px rgba(26,11,2,.45);transition:transform .4s cubic-bezier(.2,.8,.2,1);box-sizing:border-box}
+.sleeve:hover .sticker{transform:translateZ(38px) rotate(calc(var(--r) * -.6)) scale(1.06)}
+.era--atp .sleeve-wrap figcaption{margin-top:2.2rem}
+.st-radio{left:-8%;bottom:-4%;--r:-10deg;width:26%;aspect-ratio:1;border-radius:50%;background:var(--rust);color:var(--tang);display:grid;place-content:center;text-align:center;font-family:var(--display);font-weight:900;font-variation-settings:"wdth" 110,"wght" 900;font-size:clamp(.5rem,1.05vw,.78rem);line-height:1}
+.st-radio b{display:block;font-size:2.15em;color:var(--amber)}
+.st-bubble{top:-8%;left:5%;--r:-6deg;background:#fff8ee;color:var(--rust);font-family:var(--display);font-weight:800;font-variation-settings:"wdth" 85,"wght" 800;font-size:clamp(.72rem,1.35vw,1rem);padding:.45em .85em;border-radius:14px;white-space:nowrap}
+.st-bubble::after{content:"";position:absolute;left:16%;bottom:-12px;border:8px solid transparent;border-top-color:#fff8ee;border-bottom:0}
+.st-tour{right:-3%;bottom:16%;--r:7deg;background:var(--amber);color:var(--rust);font-family:var(--mono);font-size:clamp(.48rem,.85vw,.64rem);letter-spacing:.1em;padding:.5em .75em;text-align:center;line-height:1.2}
+.st-tour b{display:block;font-family:var(--display);font-size:1.9em;letter-spacing:0;font-weight:900}
+.live-badge{display:none;align-items:center;gap:.45rem;color:#ff7a5a;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase}
+.live-badge::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:#ff3b1f;box-shadow:0 0 8px #ff3b1f;animation:blink 1.2s steps(2) infinite}
+.radio.is-live .live-badge{display:inline-flex}
+.radio-top .lcd-num{margin-left:auto}
+.power{background:var(--tang)!important;color:var(--rust)!important;border-color:var(--tang)!important;font-weight:600}
+
+/* ---------- MOSCA: decoración ---------- */
+.spots{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.spots i{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:calc(var(--s) * .78);background:rgba(3,8,36,.5);border-radius:42% 58% 63% 37% / 41% 44% 56% 59%;animation:blob 16s ease-in-out infinite alternate;animation-delay:var(--d)}
+@keyframes blob{0%{border-radius:42% 58% 63% 37% / 41% 44% 56% 59%;transform:translate(0,0) rotate(0deg)}50%{border-radius:58% 42% 37% 63% / 55% 38% 62% 45%}100%{border-radius:37% 63% 46% 54% / 60% 52% 48% 40%;transform:translate(18px,-26px) rotate(24deg)}}
+.cycle{position:relative;margin-top:clamp(40px,6vw,72px);padding:1.25rem 1.2rem 1.15rem;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.cycle-h{color:var(--muted);text-align:center}
+.cycle-list{list-style:none;margin:1.2rem 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem;position:relative}
+.cycle-list::before{content:"";position:absolute;left:12.5%;right:12.5%;top:2rem;border-top:2px dashed rgba(242,239,230,.3)}
+.cycle-list li{position:relative;display:grid;justify-items:center;text-align:center;gap:.2rem}
+.ci{width:4rem;height:4rem;border-radius:50%;display:grid;place-items:center;background:var(--ultra);border:1.5px solid rgba(242,239,230,.35);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.ci svg{width:2.5rem;height:2.5rem;overflow:visible}
+.cycle-list li:hover .ci{transform:translateY(-5px) rotate(-10deg)}
+.cycle-list b{font-family:var(--display);font-weight:800;font-variation-settings:"wdth" 90,"wght" 800;font-size:1.08rem;margin-top:.4rem}
+.cycle-list .mono{font-size:.58rem;color:var(--muted)}
+.cycle-list .is-now .ci{border-color:var(--tongue);box-shadow:0 0 0 6px rgba(255,95,158,.18);animation:pulse 2.2s ease-in-out infinite}
+.cycle-list .is-now b{color:var(--tongue)}
+.ci .wings{transform-origin:24px 22px;animation:flap .05s linear infinite alternate}
+@keyframes pulse{50%{box-shadow:0 0 0 13px rgba(255,95,158,.05)}}
+.cycle-note{margin-top:1rem;font-size:.92rem;color:var(--muted);text-align:center}
+.kafka-wrap{margin-top:2.6rem;max-width:26rem;filter:drop-shadow(0 18px 22px rgba(0,0,0,.45));transform:rotate(-2.2deg)}
+.kafka-page{position:relative;margin:0;padding:1.4rem 1.4rem 2.2rem;background:#eee6d2;color:#1d1a14;background-image:radial-gradient(circle at 18% 12%, rgba(120,90,40,.1), transparent 40%),radial-gradient(circle at 86% 82%, rgba(120,90,40,.12), transparent 45%);clip-path:polygon(0 0,100% 0,100% 94%,96% 97.5%,92% 94.5%,87% 98%,82% 95%,76% 99%,70% 95.5%,64% 98.5%,58% 94.5%,52% 98%,46% 95%,40% 99%,34% 95.5%,28% 98%,22% 94.5%,16% 98%,10% 95%,5% 98.5%,0 95%)}
+.kp-de{font-family:"EB Garamond",Georgia,serif;font-style:italic;font-size:1.16rem;line-height:1.38}
+.kp-es{font-family:"EB Garamond",Georgia,serif;font-size:1rem;line-height:1.45;margin-top:.75rem;color:#4a4232}
+.kafka-page figcaption{margin-top:1rem;color:#6f6450;font-size:.6rem}
+.kp-fly{position:absolute;left:66%;top:30%;width:24px;height:24px;animation:walk 11s ease-in-out infinite}
+@keyframes walk{0%,16%{transform:translate(0,0) rotate(20deg)}24%,38%{transform:translate(-44px,22px) rotate(-60deg)}46%,60%{transform:translate(-100px,8px) rotate(-100deg)}68%,82%{transform:translate(-36px,-26px) rotate(40deg)}90%,100%{transform:translate(0,0) rotate(20deg)}}
+@media (max-width:560px){.ci{width:3.1rem;height:3.1rem}.ci svg{width:2rem;height:2rem}.cycle-list::before{top:1.55rem}.cycle-list b{font-size:.92rem}}
+
+/* ---------- música: muestras de 30 s ---------- */
+[hidden]{display:none!important}
+html:not(.has-audio) .audio-only{display:none!important}
+.audio-hint{margin-top:.7rem;color:var(--bone)}
+.play{position:relative;display:inline-grid;place-items:center;width:2.3rem;height:2.3rem;margin:-.6rem 0 -.6rem -.55rem;padding:0;border:0;border-radius:50%;background:none;color:inherit;font:inherit;cursor:pointer}
+.play > *{grid-area:1 / 1}
+.play .pi,.play .eq{opacity:0;transition:opacity .2s}
+.play .pi{color:var(--accent);display:grid;place-items:center}
+.play:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.has-audio .trk{cursor:pointer;position:relative}
+.has-audio .trk:hover .play .num{opacity:0}
+.has-audio .trk:hover .play .pi{opacity:1}
+.trk.is-playing{background:var(--card)}
+.trk.is-playing .t{color:var(--accent)}
+.trk.is-playing .play .num,.trk.is-playing .play .pi{opacity:0}
+.trk.is-playing .play .eq{opacity:1}
+.trk.is-playing::after{content:"";position:absolute;left:0;bottom:-1px;height:2px;width:calc(var(--pp,0) * 100%);background:var(--accent)}
+.eq{display:flex;align-items:flex-end;gap:2px;height:.95rem}
+.eq i{width:3px;height:30%;background:var(--accent);animation:eq .8s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:-.3s}.eq i:nth-child(3){animation-delay:-.55s}
+.trk.is-paused .eq i{animation-play-state:paused}
+@keyframes eq{to{height:100%}}
+.era.is-playing .disc{animation-duration:1.7s}
+.player{position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;width:min(560px, calc(100% - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));box-sizing:border-box;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:.8rem;align-items:center;padding:.55rem .6rem .55rem .55rem;border-radius:16px;background:rgba(16,16,20,.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--bone);box-shadow:0 22px 50px -10px rgba(0,0,0,.65);border:1px solid rgba(238,235,228,.14);animation:plIn .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes plIn{from{transform:translate(-50%,130%)}}
+.pl-cover{width:52px;height:52px;object-fit:cover;border-radius:8px;transition:border-radius .4s}
+.player.is-playing .pl-cover{border-radius:50%;animation:spin 6s linear infinite}
+.pl-info{min-width:0}
+.pl-info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.95rem;line-height:1.3}
+.pl-info .mono{display:block;color:var(--dust);font-size:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-bar{height:3px;background:rgba(238,235,228,.15);border-radius:2px;margin-top:.45rem;overflow:hidden}
+.pl-bar i{display:block;height:100%;width:calc(var(--pp,0) * 100%);background:var(--pc,var(--bone))}
+.pl-btns{display:flex;gap:.3rem}
+.pl-btns button{display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;border:0;background:rgba(238,235,228,.08);color:var(--bone);cursor:pointer;transition:background-color .2s}
+.pl-btns button:hover{background:rgba(238,235,228,.18)}
+.pl-btns #plToggle{background:var(--pc,var(--bone));color:var(--night)}
+.has-player body{padding-bottom:90px}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <p class="hero-meta mono">Rodrigo Torres de la Garza · Monterrey, N.L. · 1998</p>
+    <h1 class="wordmark" aria-label="NSQK"><span aria-hidden="true">N</span><span aria-hidden="true">S</span><span aria-hidden="true">Q</span><span aria-hidden="true">K</span></h1>
+    <div class="hero-row">
+      <div class="hero-copy">
+        <p class="say mono">se dice <b>nes·kuik</b></p>
+        <p class="lede">Productor, cantante y compositor regio. Empezó a hacer pistas a los 13 años en una laptop vieja y en seis años pasó del R&amp;B casero de <em>Botánica</em> al rock distorsionado de <em>mosca</em>. Esta es su historia, disco por disco.</p>
+        <p class="scroll-cue mono">Baja para recorrer las eras <span aria-hidden="true">↓</span></p>
+        <p class="audio-only audio-hint mono">▶ Toca el número de cualquier canción para oír 30 segundos</p>
+      </div>
+      <div>
+        <div class="deck" id="deck" aria-label="Las cuatro portadas">
+          <div class="deck-inner">
+            <a class="deck-card" href="#botanica" style="--o:-1.5;--a:1.5;--z:1"><img src="img/botanica.jpg" alt="Portada de Botánica" width="560" height="560"></a>
+            <a class="deck-card" href="#roy" style="--o:-.5;--a:.5;--z:2"><img src="img/roy.jpg" alt="Portada de ROY" width="560" height="560"></a>
+            <a class="deck-card" href="#atp" style="--o:.5;--a:.5;--z:3"><img src="img/atp.jpg" alt="Portada de ATP" width="560" height="560"></a>
+            <a class="deck-card" href="#mosca" style="--o:1.5;--a:1.5;--z:4"><img src="img/mosca.jpg" alt="Portada de mosca" width="560" height="560"></a>
+          </div>
+        </div>
+        <p class="deck-hint mono">Elige una portada para ir a su era</p>
+      </div>
+    </div>
+  </div>
+  <div class="fly landed" id="heroFly" aria-hidden="true">
+    <svg viewBox="0 0 30 30" width="30" height="30">
+      <g class="wings">
+        <ellipse cx="9" cy="16" rx="7" ry="3.1" transform="rotate(-38 9 16)" fill="rgba(222,228,255,.42)" stroke="rgba(238,235,228,.7)" stroke-width=".5"/>
+        <ellipse cx="21" cy="16" rx="7" ry="3.1" transform="rotate(38 21 16)" fill="rgba(222,228,255,.42)" stroke="rgba(238,235,228,.7)" stroke-width=".5"/>
+      </g>
+      <ellipse cx="15" cy="17.5" rx="3.7" ry="6.2" fill="#18181d" stroke="rgba(238,235,228,.6)" stroke-width=".7"/>
+      <circle cx="15" cy="9.8" r="3.2" fill="#18181d" stroke="rgba(238,235,228,.6)" stroke-width=".7"/>
+      <circle cx="13.5" cy="9.2" r="1.35" fill="#9a2430"/><circle cx="16.5" cy="9.2" r="1.35" fill="#9a2430"/>
+    </svg>
+  </div>
+</header>
+
+<div class="eras-nav">
+  <div class="wrap nav-inner">
+    <span class="nav-mark">NSQK</span>
+    <span class="nav-now mono" id="navNow"><i class="sw"></i><span id="navNowText">4 eras · 2020–2026</span></span>
+  </div>
+  <div class="nav-progress" aria-hidden="true">
+    <span class="bar"></span>
+    <svg class="nav-fly" viewBox="0 0 30 30"><g fill="currentColor"><ellipse cx="9" cy="16" rx="7" ry="3" transform="rotate(-38 9 16)" opacity=".45"/><ellipse cx="21" cy="16" rx="7" ry="3" transform="rotate(38 21 16)" opacity=".45"/><ellipse cx="15" cy="17.5" rx="3.7" ry="6.2"/><circle cx="15" cy="9.8" r="3.2"/></g></svg>
+  </div>
+</div>
+
+<main>
+<section class="bio" id="quien" aria-labelledby="t-bio">
+  <div class="wrap">
+    <div class="bio-grid">
+      <figure class="photo">
+        <img src="img/nsqk-2021.jpg" alt="Nsqk de pie, de noche, con suéter azul oscuro y luces cálidas detrás" width="760" height="758" loading="lazy">
+        <figcaption class="mono">Nsqk en 2021 · foto: CapitanTick3, dominio público (CC0)</figcaption>
+      </figure>
+      <div>
+        <p class="kicker mono">Quién es</p>
+        <h2 class="h-sec" id="t-bio">Antes de las eras</h2>
+        <div class="prose">
+          <p>Rodrigo Torres de la Garza nació en Monterrey el 27 de abril de 1998 y creció en Houston, Texas. Con la crisis de 2008 su familia regresó a Monterrey.</p>
+          <p>A los 13 años quiso entender cómo hacían sus canciones Skrillex, Swedish House Mafia y Avicii. Con una laptop vieja que le regaló un familiar aprendió a producir solo y empezó a subir pistas a SoundCloud y YouTube. Sus papás no estaban en contra de la música; les preocupaba que descuidara la escuela.</p>
+          <p>El nombre se lo sugirió en broma un amigo de Instagram. Antes usaba el usuario <i>nsqkpapi</i>, burlándose de los nombres estilo Drake y ASAP Mob. En 2018 armó No Pedí Permiso con sus mejores amigos: un colectivo sin mánager ni mentor donde aprendieron solos a sacar y mover su música.</p>
+          <blockquote class="quote">Creo que tengo el talento para lograrlo; el hambre me sobra.» <cite>Nsqk a Metal Magazine</cite></blockquote>
+        </div>
+        <ol class="timeline">
+          <li><span class="y">1998</span><span>Nace en Monterrey, Nuevo León.</span></li>
+          <li><span class="y">2008</span><span>Regresa de Houston a Monterrey.</span></li>
+          <li><span class="y">2011</span><span>Empieza a producir, a los 13 años.</span></li>
+          <li><span class="y">2015</span><span>Entra a Internet Trash Collective, un grupo de músicos que se juntó en línea.</span></li>
+          <li><span class="y">2018</span><span>Funda el colectivo No Pedí Permiso.</span></li>
+          <li class="is-era" style="--c:#b9d39c"><span class="y">2020</span><span><b>Botánica</b>, su primer EP.</span></li>
+          <li><span class="y">2021</span><span>Braille, EP en dupla con Méne.</span></li>
+          <li class="is-era" style="--c:var(--chalk)"><span class="y">2022</span><span><b>ROY</b>, su primer álbum.</span></li>
+          <li><span class="y">2023</span><span>ROY EN VIVO y Festival Ceremonia. Rolling Stone en Español lo llama «la guía hacia el futuro».</span></li>
+          <li class="is-era" style="--c:var(--tang)"><span class="y">2024</span><span>Lollapalooza Chile, <b>ATP</b> y el Alter Ego Tour.</span></li>
+          <li class="is-era" style="--c:#8fa6ff"><span class="y">2026</span><span><b>mosca</b>, su COLORS SHOW y su nombre en el cartel de Camp Flog Gnaw.</span></li>
+        </ol>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b data-count="4">4</b><span>discos propios en seis años</span></div>
+      <div class="stat"><b data-count="51">51</b><span>canciones entre las cuatro eras</span></div>
+      <div class="stat"><b data-count="156">156</b><span>minutos de música, sin contar sencillos</span></div>
+      <div class="stat"><b data-count="13.2" data-suf=" M">13.2 M</b><span>reproducciones de ATP en su primera semana</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== BOTÁNICA ====================== -->
+<section class="era era--botanica" id="botanica" aria-labelledby="t-botanica">
+  <canvas class="fx" id="vines" aria-hidden="true"></canvas>
+  <div class="wrap era-inner">
+    <div class="era-top">
+      <p class="era-index mono">Era 1 de 4 · enero 2020</p>
+      <h2 class="era-title botanica-title" id="t-botanica">Botánica</h2>
+      <dl class="era-facts mono">
+        <div><dt>Formato</dt><dd>EP</dd></div>
+        <div><dt>Salida</dt><dd>31 ene 2020</dd></div>
+        <div><dt>Sello</dt><dd>No Pedí Permiso</dd></div>
+        <div><dt>Canciones</dt><dd>5</dd></div>
+        <div><dt>Duración</dt><dd data-runtime="botanica">15:30</dd></div>
+      </dl>
+    </div>
+    <div class="era-grid">
+      <figure class="sleeve-wrap">
+        <div class="sleeve">
+          <div class="sleeve-3d">
+            <div class="vinyl"><div class="disc"><span class="label" style="background-image:url('img/botanica.jpg')"></span></div></div>
+            <img class="cover" src="img/botanica.jpg" alt="Portada de Botánica: foto casera de un niño a medio salto en un patio con juegos infantiles" width="560" height="560" loading="lazy">
+          </div>
+        </div>
+        <figcaption>La portada es una foto casera: un niño a medio salto en un patio con resbaladilla. Cálida y doméstica, como el disco.</figcaption>
+      </figure>
+      <div class="era-story">
+        <p class="era-lede">El debut. Cinco canciones que escribió, produjo y cantó él solo, sobre el amor, las relaciones a distancia y ser joven.</p>
+        <p>Salió el 31 de enero de 2020, unas semanas antes del encierro, bajo No Pedí Permiso. Suena cálido y limpio: pop, rap y R&amp;B con restos de la electrónica con la que aprendió a producir. Sus referencias eran Tyler, The Creator, Mac Miller y Radiohead, y del rock tomó estructuras y alguna guitarra.</p>
+        <p>Para julio de 2020 ya pasaba del millón de reproducciones y lo puso en la conversación de la música mexicana. En esa época ya avisaba que lo siguiente iba a sonar más sucio y con más rock. Hoy dice que no se identifica del todo con Botánica, pero lo valora.</p>
+        <blockquote class="quote">Tengo mucha hambre, y eso apenas comienza.» <cite>Nsqk, julio de 2020</cite></blockquote>
+        <div class="aside-card">
+          <img src="img/braille.jpg" alt="Portada de Braille: dos figuras desnudas pintadas bailando sobre pasto verde y cielo azul" width="96" height="96" loading="lazy">
+          <p><span class="mono">Lo que siguió · 2021</span><b>Braille</b>, un EP en dupla con Méne que los llevó a tocar en varias ciudades del país.</p>
+        </div>
+      </div>
+    </div>
+    <div class="tracks">
+      <div class="tracks-head">
+        <h3>Las canciones</h3>
+        <div class="meta mono"><span>5 canciones · <span data-runtime="botanica">15:30</span></span><a class="listen-link" href="https://music.apple.com/mx/album/bot%C3%A1nica-ep/1496488400" target="_blank" rel="noopener">Escuchar ↗</a></div>
+      </div>
+      <div data-tracks="botanica"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== ROY ====================== -->
+<section class="era era--roy" id="roy" aria-labelledby="t-roy">
+  <div class="roy-dark" id="royDark" aria-hidden="true"></div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+  <div class="wrap era-inner">
+    <div class="era-top">
+      <p class="era-index mono">Era 2 de 4 · noviembre 2022</p>
+      <div class="roy-head">
+        <div class="roy-word">
+          <span class="roy-ghost" aria-hidden="true">ROY</span>
+          <h2 class="era-title roy-title" id="t-roy">ROY</h2>
+        </div>
+        <div class="alias-wrap">
+          <ol class="alias" aria-label="Sus tres nombres">
+            <li><span class="mono">Su nombre</span><b>Rodrigo</b></li>
+            <li class="is-roy"><span class="mono">Como le dicen en casa</span><b>Roy</b></li>
+            <li><span class="mono">El artista</span><b>Nsqk</b></li>
+          </ol>
+          <p class="alias-note">Con el tiempo vio a Roy como un alter ego más cerca de Rodrigo que de Nsqk.</p>
+        </div>
+      </div>
+      <dl class="era-facts mono">
+        <div><dt>Formato</dt><dd>Álbum</dd></div>
+        <div><dt>Salida</dt><dd>23 nov 2022</dd></div>
+        <div><dt>Sello</dt><dd>Honey</dd></div>
+        <div><dt>Canciones</dt><dd>12</dd></div>
+        <div><dt>Duración</dt><dd data-runtime="roy">39:11</dd></div>
+      </dl>
+    </div>
+  </div>
+  <div class="roy-bands" aria-hidden="true">
+    <div class="band band--b"><div class="band-track"><span>¿EN QUÉ MOMENTO? × CUANDO ME VAYA × TORRE 3 × DIENTES × SI EN TU MENTE ESTUVE × SUR × ALGO EXTRAÑO × OJERAS × CORAZÓN : CLASSICS × ANTAGONISTA × MOLDES × EL TIEMPO QUE NECESITES ×</span><span>¿EN QUÉ MOMENTO? × CUANDO ME VAYA × TORRE 3 × DIENTES × SI EN TU MENTE ESTUVE × SUR × ALGO EXTRAÑO × OJERAS × CORAZÓN : CLASSICS × ANTAGONISTA × MOLDES × EL TIEMPO QUE NECESITES ×</span></div></div>
+    <div class="band band--a"><div class="band-track"><span>MIEDO A CRECER × INSOMNIO × SÍNDROME DEL IMPOSTOR × DEPRESIÓN × CATARSIS × ACEPTARTE × MIEDO A CRECER × INSOMNIO × SÍNDROME DEL IMPOSTOR × DEPRESIÓN × CATARSIS × ACEPTARTE ×</span><span>MIEDO A CRECER × INSOMNIO × SÍNDROME DEL IMPOSTOR × DEPRESIÓN × CATARSIS × ACEPTARTE × MIEDO A CRECER × INSOMNIO × SÍNDROME DEL IMPOSTOR × DEPRESIÓN × CATARSIS × ACEPTARTE ×</span></div></div>
+  </div>
+  <div class="wrap era-inner">
+    <div class="era-grid">
+      <figure class="sleeve-wrap">
+        <div class="sleeve">
+          <div class="sleeve-3d">
+            <div class="vinyl"><div class="disc"><span class="label" style="background-image:url('img/roy.jpg')"></span></div></div>
+            <img class="cover" src="img/roy.jpg" alt="Portada de ROY: foto en blanco y negro de Nsqk con la cara a medias detrás de un brazo tatuado" width="560" height="560" loading="lazy">
+            <span class="tape tape--l" aria-hidden="true"></span>
+            <span class="tape tape--r" aria-hidden="true"></span>
+            <svg class="stamp" viewBox="0 0 120 120" aria-hidden="true">
+              <defs><path id="stampPath" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
+              <g>
+                <circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" stroke-width="2"/>
+                <circle cx="60" cy="60" r="31" fill="none" stroke="currentColor" stroke-width="1"/>
+                <text font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor"><textPath href="#stampPath" textLength="272" lengthAdjust="spacing">ROY · HONEY · 23 NOV 2022 · NSQK ·</textPath></text>
+              </g>
+              <text x="60" y="69" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="900" font-size="26" fill="currentColor">R</text>
+            </svg>
+          </div>
+        </div>
+        <figcaption>Blanco y negro, la cara a medias detrás de un brazo tatuado. El color se quedó en Botánica.</figcaption>
+      </figure>
+      <div class="era-story">
+        <p class="era-lede">Su primer álbum largo y el más oscuro. Lo empezó al inicio de la pandemia y le tomó cerca de tres años.</p>
+        <p>Repetir el sonido de Botánica le parecía el camino fácil, así que sacó del disco las canciones que se podían etiquetar con facilidad. Casi todas se van armando hasta reventar en un clímax electrónico.</p>
+        <blockquote class="quote">Algo un poco más <mark>visceral</mark>, un poco más <mark>polarizante</mark>, un poco más <mark>left field</mark>.» <cite>Nsqk a Sopitas, sobre ROY</cite></blockquote>
+        <div class="liner">
+          <p class="liner-h mono">Notas del disco</p>
+          <dl>
+            <div><dt>Producción</dt><dd>Nsqk, él solo</dd></div>
+            <div><dt>Grabación</dt><dd>Su casa y Worldwide Records</dd></div>
+            <div><dt>Sonido</dt><dd>Electrónica y R&amp;B alternativo</dd></div>
+            <div><dt>En la cabeza</dt><dd>Porter Robinson, Madeon, Deb Never</dd></div>
+            <div><dt>Empezó</dt><dd>Al inicio de la pandemia</dd></div>
+            <div><dt>Después</dt><dd>ROY EN VIVO, 2023</dd></div>
+          </dl>
+        </div>
+        <p>Las letras hablan del miedo a crecer, de la depresión, de no ser quien te prometiste y de aprender a aceptarte. Él lo resume como un disco experimental sobre salud mental, y como una catarsis.</p>
+        <p>En vivo creció todavía más: en 2023 salió ROY EN VIVO, tocó en Festival Ceremonia y Rolling Stone en Español lo llamó «la guía hacia el futuro». También confesó que, al terminarlo, ya no se estaba divirtiendo haciendo música. Eso cambió lo que vino después.</p>
+      </div>
+    </div>
+    <div class="tracks">
+      <div class="tracks-head">
+        <h3>Las canciones</h3>
+        <div class="meta mono"><span>12 canciones · <span data-runtime="roy">39:11</span></span><a class="listen-link" href="https://music.apple.com/mx/album/roy/6769182608" target="_blank" rel="noopener">Escuchar ↗</a></div>
+      </div>
+      <div data-tracks="roy"></div>
+    </div>
+    <div class="around">
+      <h3>Alrededor de ROY</h3>
+      <p class="sub">El sencillo que lo abrió, el que tuvo segunda vida y el disco en vivo, donde algunas versiones le gustan más que las de estudio.</p>
+      <div class="around-grid">
+        <figure><img src="img/cuandomevaya.jpg" alt="Portada de Cuando Me Vaya: Nsqk sentado en un sillón de una sala antigua con luz cálida" width="420" height="420" loading="lazy"><figcaption><b>Cuando Me Vaya</b><span class="mono">Sencillo · sep 2022</span><span>El primer adelanto, y la canción más personal del disco.</span></figcaption></figure>
+        <figure><img src="img/corazon.jpg" alt="Portada de Corazón : Classics en rojo, blanco y negro con tipografía grande" width="420" height="420" loading="lazy"><figcaption><b>Corazón : Classics</b><span class="mono">Sencillo · mar 2023</span><span>Con el disco ya afuera, salió por separado con portada propia.</span></figcaption></figure>
+        <figure><img src="img/royenvivo.jpg" alt="Portada de ROY EN VIVO 2023: retrato en rojo y negro de Nsqk con gorro, tapándose la cara con las manos" width="420" height="420" loading="lazy"><figcaption><b>ROY EN VIVO 2023</b><span class="mono">Álbum en vivo · sep 2023</span><span>17 temas grabados en directo.</span></figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== ATP ====================== -->
+<section class="era era--atp" id="atp" aria-labelledby="t-atp">
+  <div class="wrap era-inner">
+    <div class="era-top">
+      <p class="era-index mono">Era 3 de 4 · agosto 2024</p>
+      <div class="atp-head">
+        <div class="atp-word">
+          <div class="waves" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <h2 class="era-title atp-title" id="t-atp">ATP</h2>
+          <p class="atp-sub">Aún Te Pienso</p>
+        </div>
+        <figure class="molecule">
+          <svg viewBox="0 0 430 140" role="img" aria-label="Molécula de ATP dibujada: adenina, ribosa y tres fosfatos rotulados Aún, Te y Pienso">
+            <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M55 52 L79 66 L79 94 L55 108 L31 94 L31 66 Z"/>
+              <path d="M38 70 L55 60.5" opacity=".5"/>
+              <path d="M79 66 L103 58 L118 80 L103 102 L79 94"/>
+              <path d="M118 80 L151 80"/>
+              <path d="M174 58 L197 74 L189 101 L159 101 L151 74 Z"/>
+              <path d="M197 74 L222 62 L238 62"/>
+              <path d="M278 62 q5 -7 10 0 t10 0"/>
+              <path class="sq-hot" d="M338 62 q5 -7 10 0 t10 0"/>
+              <path d="M258 42 L258 32 M318 42 L318 32"/>
+            </g>
+            <text class="lbl" x="55" y="130" text-anchor="middle">adenina</text>
+            <text class="lbl" x="174" y="124" text-anchor="middle">ribosa</text>
+            <g><circle class="pc" cx="258" cy="62" r="20"/><text class="pt" x="258" y="68" text-anchor="middle">P</text><text class="o" x="258" y="26" text-anchor="middle">O</text><text class="word" x="258" y="112" text-anchor="middle">Aún</text></g>
+            <g><circle class="pc" cx="318" cy="62" r="20"/><text class="pt" x="318" y="68" text-anchor="middle">P</text><text class="o" x="318" y="26" text-anchor="middle">O</text><text class="word" x="318" y="112" text-anchor="middle">Te</text></g>
+            <g class="spark" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M348 46 L348 38 M339 50 L333 44 M357 50 L363 44 M348 78 L348 86"/></g>
+            <g class="p3"><circle class="pc" cx="378" cy="62" r="20"/><text class="pt" x="378" y="68" text-anchor="middle">P</text><path d="M378 42 L378 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><text class="o" x="378" y="26" text-anchor="middle">O</text><text class="word" x="378" y="112" text-anchor="middle">Pienso</text></g>
+          </svg>
+          <figcaption>ATP también es el adenosín trifosfato, la molécula que carga la energía de tus células. Sus tres fosfatos aquí dicen otra cosa.</figcaption>
+        </figure>
+      </div>
+      <dl class="era-facts mono">
+        <div><dt>Formato</dt><dd>Mixtape / álbum</dd></div>
+        <div><dt>Salida</dt><dd>14 ago 2024</dd></div>
+        <div><dt>Sello</dt><dd>Honey · Worldwide</dd></div>
+        <div><dt>Pistas</dt><dd>12 + 5 skits</dd></div>
+        <div><dt>Duración</dt><dd data-runtime="atp">40:25</dd></div>
+      </dl>
+    </div>
+  </div>
+  <div class="led" aria-hidden="true"><div class="led-track"><span>Radio ATP 30.9 • Hecho en la CDMX • En cabina: El Mariana • ¿Do you think about me? • Aún te pienso • 12 canciones y 5 skits •</span><span>Radio ATP 30.9 • Hecho en la CDMX • En cabina: El Mariana • ¿Do you think about me? • Aún te pienso • 12 canciones y 5 skits •</span></div></div>
+  <div class="wrap era-inner">
+    <div class="era-grid">
+      <figure class="sleeve-wrap">
+        <div class="sleeve">
+          <div class="sleeve-3d">
+            <div class="vinyl"><div class="disc"><span class="label" style="background-image:url('img/atp.jpg')"></span></div></div>
+            <img class="cover" src="img/atp.jpg" alt="Portada de ATP: Nsqk sonriendo muy de cerca, con un grill que dice ATP en los dientes" width="560" height="560" loading="lazy">
+            <span class="sticker st-bubble" aria-hidden="true">Do you think about me?</span>
+            <span class="sticker st-radio" aria-hidden="true">RADIO ATP<b>30.9</b></span>
+            <span class="sticker st-tour" aria-hidden="true">ALTER EGO TOUR<b>2024</b></span>
+          </div>
+        </div>
+        <figcaption>Sonrisa de grill con las letras ATP. El naranja de toda la era fue idea de Valeria, su estilista y directora creativa.</figcaption>
+      </figure>
+      <div class="era-story">
+        <p class="era-lede">Aún Te Pienso. Iba a ser un mixtape y terminó siendo un disco armado como una estación de radio, de esas que escuchas en el coche.</p>
+        <p>Si ROY salió de pasarla mal, ATP salió de pasarla bien. Lo escribió viviendo en la Ciudad de México, lejos de su pareja y de su familia.</p>
+        <blockquote class="quote">Son los dos extremos.» <cite>Nsqk a Rolling Stone en Español, sobre ROY y ATP</cite></blockquote>
+        <p>La estación se llama Radio ATP 30.9 y la conduce el streamer El Mariana. Las referencias fueron <i>Dawn FM</i> de The Weeknd, <i>Flower Boy</i> de Tyler, <i>FM!</i> de Vince Staples y las radios de GTA y Forza. La producción es más mínima que antes, con la voz y la letra al frente, aunque él se considera un productor maximalista.</p>
+        <p>Desde octubre de 2023 fue soltando sencillos que no entraron al disco, todos con la misma frase sampleada: «Do you think about me?». ATP es la respuesta.</p>
+        <div class="numbers">
+          <div><b>#5</b><span>Top Albums Debut Global de Spotify</span></div>
+          <div><b>13.2 M</b><span>reproducciones en la primera semana</span></div>
+          <div><b>#82</b><span>100 mejores discos de 2024, Rolling Stone</span></div>
+        </div>
+        <p>Lo llevó al Alter Ego Tour, de Guadalajara a Hermosillo pasando por Monterrey, Los Ángeles, San Antonio y Tijuana, y cerró la era en diciembre de 2024 con UGH / OTROS LUGARES, la segunda junto a DrefQuila.</p>
+      </div>
+    </div>
+
+    <div class="program">
+      <div class="radio" id="radio">
+        <div class="radio-top">
+          <span class="radio-brand">RADIO ATP <b>30.9</b></span>
+          <span class="live-badge">En el aire</span>
+          <span class="lcd-num">17 pistas</span>
+        </div>
+        <div class="lcd" id="lcd">
+          <canvas width="160" height="56" aria-hidden="true"></canvas>
+          <div class="lcd-text" aria-live="polite">
+            <div class="lcd-num" id="lcdNum">Pista 02 / 17</div>
+            <div class="lcd-title" id="lcdTitle">Aún Te Pienso</div>
+            <div class="lcd-sub" id="lcdSub">Nsqk · 1:48</div>
+          </div>
+        </div>
+        <div class="dial" id="dial">
+          <div class="ticks" id="ticks" aria-hidden="true"></div>
+          <label class="sr" for="tuner">Sintonizar una pista de ATP</label>
+          <input type="range" id="tuner" min="1" max="17" step="1" value="2">
+          <div class="dial-ends" aria-hidden="true"><span>01 · Radio ATP</span><span>17 · RIP PETE</span></div>
+        </div>
+        <p class="radio-note" id="radioNote">La canción que da nombre al disco. Rap y R&amp;B melancólico: desearle lo mejor a alguien que ya no está, y la presión de que la música ahora sea su trabajo de tiempo completo.</p>
+        <div class="radio-ctrl">
+          <button type="button" id="prevSt">◀ Anterior</button>
+          <button type="button" id="powerBtn" class="audio-only power" aria-pressed="false">▶ Encender</button>
+          <button type="button" id="nextSt">Siguiente ▶</button>
+        </div>
+        <div class="grille" aria-hidden="true"></div>
+      </div>
+      <div class="tracks">
+        <div class="tracks-head">
+          <h3>La programación</h3>
+          <div class="meta mono"><span>17 pistas · <span data-runtime="atp">40:25</span></span><a class="listen-link" href="https://music.apple.com/mx/album/atp/1888034831" target="_blank" rel="noopener">Escuchar ↗</a></div>
+        </div>
+        <p class="radio-hint">Mueve el dial o pica un número y el radio te cuenta de qué va cada pista. Los skits son la cabina de El Mariana.<span class="audio-only"> Enciende el radio para oír 30 segundos de cada pista.</span></p>
+        <div data-tracks="atp"></div>
+      </div>
+    </div>
+
+    <div class="around">
+      <h3>Do you think about me?</h3>
+      <p class="sub">Los sencillos que prepararon la pregunta, el adelanto que dividió a su público y el que cerró la era.</p>
+      <div class="around-grid c4">
+        <figure><img src="img/lovelanguage.jpg" alt="Portada de LOVELANGUAGE: personaje azul brillante sobre fondo rosa con una flor" width="420" height="420" loading="lazy"><figcaption><b>LOVELANGUAGE</b><span class="mono">Sencillo · oct 2023</span><span>El primero con la frase sampleada.</span></figcaption></figure>
+        <figure><img src="img/sisifo.jpg" alt="Portada de SÍSIFO / NADIE MÁS!: corona de flores azules sobre fondo azul" width="420" height="420" loading="lazy"><figcaption><b>SÍSIFO / NADIE MÁS!</b><span class="mono">Sencillo doble · abr 2024</span><span>El mito de empezar de cero en cada disco.</span></figcaption></figure>
+        <figure><img src="img/misa.jpg" alt="Portada de misa: figura de un animal esquelético en naranja sobre fondo rojo oscuro" width="420" height="420" loading="lazy"><figcaption><b>misa</b><span class="mono">Adelanto · jul 2024</span><span>Corrido y ranchera sobre baterías de funk.</span></figcaption></figure>
+        <figure><img src="img/ugh.jpg" alt="Portada de UGH / OTROS LUGARES: foto en blanco y negro de un ring de box con una figura gigante caída" width="420" height="420" loading="lazy"><figcaption><b>UGH / OTROS LUGARES</b><span class="mono">Sencillo doble · dic 2024</span><span>El cierre de la era, con DrefQuila.</span></figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== MOSCA ====================== -->
+<section class="era era--mosca" id="mosca" aria-labelledby="t-mosca">
+  <div class="spots" aria-hidden="true"><i style="--x:-3%;--y:4%;--s:140px;--d:0s"></i><i style="--x:90%;--y:9%;--s:110px;--d:-3s"></i><i style="--x:93%;--y:24%;--s:70px;--d:-6s"></i><i style="--x:-2%;--y:33%;--s:90px;--d:-2s"></i><i style="--x:88%;--y:46%;--s:150px;--d:-9s"></i><i style="--x:2%;--y:58%;--s:60px;--d:-5s"></i><i style="--x:-4%;--y:72%;--s:160px;--d:-11s"></i><i style="--x:91%;--y:80%;--s:80px;--d:-7s"></i><i style="--x:46%;--y:95%;--s:120px;--d:-4s"></i></div>
+  <canvas class="fx" id="flies" aria-hidden="true"></canvas>
+  <div class="wrap era-inner">
+    <div class="era-top">
+      <p class="era-index mono">Era 4 de 4 · octubre 2026 · <span class="now">la actual</span></p>
+      <h2 class="era-title mosca-title" id="t-mosca" aria-label="mosca"><span style="--i:0" aria-hidden="true">m</span><span style="--i:1" aria-hidden="true">o</span><span style="--i:2" aria-hidden="true">s</span><span style="--i:3" aria-hidden="true">c</span><span style="--i:4" aria-hidden="true">a</span></h2>
+      <dl class="era-facts mono">
+        <div><dt>Formato</dt><dd>Álbum</dd></div>
+        <div><dt>Salida</dt><dd>15 oct 2026</dd></div>
+        <div><dt>Sello</dt><dd>Honey · Worldwide</dd></div>
+        <div><dt>Canciones</dt><dd>17</dd></div>
+        <div><dt>Duración</dt><dd data-runtime="mosca">1 h 01 min</dd></div>
+      </dl>
+    </div>
+    <div class="cycle">
+      <p class="cycle-h mono">Metamorfosis completa · cuatro etapas, cuatro discos</p>
+      <ol class="cycle-list">
+        <li><span class="ci"><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="#f2efe6"><ellipse cx="17" cy="26" rx="4" ry="9" transform="rotate(-18 17 26)"/><ellipse cx="25" cy="23" rx="4" ry="9.5" transform="rotate(5 25 23)"/><ellipse cx="32.5" cy="27" rx="3.6" ry="8.5" transform="rotate(24 32.5 27)"/></g></svg></span><b>Huevo</b><span class="mono">Botánica · 2020</span></li>
+        <li><span class="ci"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 31 C 11 17, 31 12, 39 21 C 42 25, 40 31, 35 30.5 C 30 25.5, 18 25.5, 14 33 C 12 35.5, 8.5 34, 9 31 Z" fill="#f2efe6"/><g stroke="#0c2c94" stroke-width="1.3" stroke-linecap="round"><path d="M16 22.5 L19 27.5"/><path d="M22.5 19.5 L24 25.5"/><path d="M29 18.5 L29 24.5"/><path d="M34.5 20.5 L33 25.5"/></g></svg></span><b>Larva</b><span class="mono">ROY · 2022</span></li>
+        <li><span class="ci"><svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="24" rx="15" ry="9.5" fill="#b8703f" stroke="#f2efe6" stroke-width="1.2"/><g fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.2"><path d="M14 18 Q12 24 14 30"/><path d="M19 15.6 Q17 24 19 32.4"/><path d="M24 15 Q22 24 24 33"/><path d="M29 15.6 Q27 24 29 32.4"/><path d="M34 18 Q32 24 34 30"/></g></svg></span><b>Pupa</b><span class="mono">ATP · 2024</span></li>
+        <li class="is-now"><span class="ci"><svg viewBox="0 0 48 48" aria-hidden="true"><g class="wings"><ellipse cx="15" cy="25" rx="10" ry="4.4" transform="rotate(-36 15 25)" fill="rgba(242,239,230,.5)" stroke="#f2efe6" stroke-width=".8"/><ellipse cx="33" cy="25" rx="10" ry="4.4" transform="rotate(36 33 25)" fill="rgba(242,239,230,.5)" stroke="#f2efe6" stroke-width=".8"/></g><ellipse cx="24" cy="28" rx="5.4" ry="9" fill="#050817" stroke="#f2efe6" stroke-width=".9"/><circle cx="24" cy="16.5" r="4.6" fill="#050817" stroke="#f2efe6" stroke-width=".9"/><circle cx="21.8" cy="15.6" r="2" fill="#ff5f9e"/><circle cx="26.2" cy="15.6" r="2" fill="#ff5f9e"/></svg></span><b>Mosca</b><span class="mono">mosca · 2026</span></li>
+      </ol>
+      <p class="cycle-note">Las moscas pasan por cuatro etapas antes de volar. Nsqk va en su cuarto disco.</p>
+    </div>
+    <div class="era-grid">
+      <figure class="sleeve-wrap">
+        <div class="sleeve">
+          <div class="sleeve-3d">
+            <div class="vinyl"><div class="disc"><span class="label" style="background-image:url('img/mosca.jpg')"></span></div></div>
+            <img class="cover" src="img/mosca.jpg" alt="Portada de mosca: un dálmata de expresión extraña con la lengua de fuera sobre fondo azul ultramar" width="560" height="560" loading="lazy">
+          </div>
+        </div>
+        <figcaption>Un dálmata raro sobre azul ultramar. <span class="shoo">Mueve el cursor por esta sección: las moscas se espantan.</span></figcaption>
+        <div class="kafka-wrap">
+          <figure class="kafka-page">
+            <p class="kp-de" lang="de">Als Gregor Samsa eines Morgens aus unruhigen Träumen erwachte, fand er sich in seinem Bett zu einem ungeheueren Ungeziefer verwandelt.</p>
+            <p class="kp-es">Una mañana, al despertar de sueños intranquilos, Gregor Samsa se encontró en su cama convertido en un insecto monstruoso.</p>
+            <figcaption class="mono">Franz Kafka · <i>La metamorfosis</i>, 1915 · primera línea</figcaption>
+            <svg class="kp-fly" viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="9" cy="16" rx="7" ry="3" transform="rotate(-38 9 16)" fill="rgba(60,60,70,.35)"/><ellipse cx="21" cy="16" rx="7" ry="3" transform="rotate(38 21 16)" fill="rgba(60,60,70,.35)"/><ellipse cx="15" cy="17.5" rx="3.7" ry="6.2" fill="#15130f"/><circle cx="15" cy="9.8" r="3.2" fill="#15130f"/><circle cx="13.5" cy="9.2" r="1.3" fill="#8a2a2a"/><circle cx="16.5" cy="9.2" r="1.3" fill="#8a2a2a"/></svg>
+          </figure>
+        </div>
+      </figure>
+      <div class="era-story">
+        <p class="era-lede">El disco de la metamorfosis. Diecisiete canciones, una hora y un giro al rock con guitarras distorsionadas.</p>
+        <p>Después de ATP su departamento se llenó de moscas. Él lo achacó a una brujería; tras una limpia se fueron, pero igual se mudó. En esos meses dos personas distintas le regalaron <i>La metamorfosis</i> de Kafka, y se obsesionó.</p>
+        <p>De ahí salió la pregunta que amarra el disco: ¿en qué se convierte alguien que persigue la grandeza? Comparó la fama con lo que le pasa a Gregor Samsa, el vendedor que un día despierta convertido en insecto.</p>
+        <div class="bookends" aria-label="El disco empieza y termina con personajes de La metamorfosis">
+          <div class="b"><span class="mono">Pista 01</span><span class="bn">SAMSA</span><small>Gregor, el que se transforma</small></div>
+          <div class="arrow"><svg width="54" height="12" viewBox="0 0 54 12" aria-hidden="true"><path d="M1 6h50M45 1l6 5-6 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>15 canciones</div>
+          <div class="b"><span class="mono">Pista 17</span><span class="bn">MARGOT</span><small>Grete, la hermana que lo cuida</small></div>
+        </div>
+        <p>Le tomó dos años y medio y lo produjo él. Pensó en Radiohead, Atoms for Peace, Blink-182, Smashing Pumpkins y en <i>DATA</i> de Tainy, sin soltar el hip hop ni la electrónica; en medio caben un sierreño triste, techno y funk.</p>
+        <p>Lo fue enseñando con una experiencia tipo videojuego en su página y lo estrenó el 15 de octubre de 2026, con Nina, Jean Dawson, Riosse, Eslabon Armado, Julieta Venegas y Kevin Kaarl como invitados. Ya aparece en el cartel de Camp Flog Gnaw, el festival de Tyler, The Creator, una de sus primeras influencias.</p>
+        <blockquote class="quote">El lado más grotesco de perseguir la grandeza.» <cite>Rolling Stone en Español, sobre mosca</cite></blockquote>
+        <div class="aside-card">
+          <img src="img/colors.jpg" alt="Nsqk con el pelo decolorado y ropa negra frente a un fondo azul oscuro, con el logo de COLORS" width="96" height="96" loading="lazy">
+          <p><span class="mono">A COLORS SHOW · sep 2026</span>Antes del disco presentó <b>tuffluv</b> en el formato de COLORS: un cuarto de un solo color y una toma en vivo.</p>
+        </div>
+      </div>
+    </div>
+    <div class="tracks">
+      <div class="tracks-head">
+        <h3>Las canciones</h3>
+        <div class="meta mono"><span>17 canciones · <span data-runtime="mosca">1 h 01 min</span></span><a class="listen-link" href="https://music.apple.com/mx/album/mosca/6813620396" target="_blank" rel="noopener">Escuchar ↗</a></div>
+      </div>
+      <div data-tracks="mosca"></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="outro" id="escuchar" aria-labelledby="t-outro">
+  <div class="wrap">
+    <p class="kicker mono">Para cerrar</p>
+    <h2 class="h-sec" id="t-outro">Escúchalos en orden</h2>
+    <p class="lede" style="color:var(--dust)">Del patio de Botánica a las moscas de su departamento: cuatro discos, cuatro versiones de la misma persona.</p>
+    <div class="listen">
+      <div class="listen-card"><img src="img/botanica.jpg" alt="" width="560" height="560" loading="lazy"><h3>Botánica</h3><span class="mono">EP · 2020</span><div class="links"><a class="btn" href="https://music.apple.com/mx/album/bot%C3%A1nica-ep/1496488400" target="_blank" rel="noopener">Apple Music ↗</a><a class="btn" href="https://open.spotify.com/search/Nsqk%20Bot%C3%A1nica" target="_blank" rel="noopener">Spotify ↗</a></div></div>
+      <div class="listen-card"><img src="img/roy.jpg" alt="" width="560" height="560" loading="lazy"><h3>ROY</h3><span class="mono">Álbum · 2022</span><div class="links"><a class="btn" href="https://music.apple.com/mx/album/roy/6769182608" target="_blank" rel="noopener">Apple Music ↗</a><a class="btn" href="https://open.spotify.com/search/Nsqk%20ROY" target="_blank" rel="noopener">Spotify ↗</a></div></div>
+      <div class="listen-card"><img src="img/atp.jpg" alt="" width="560" height="560" loading="lazy"><h3>ATP</h3><span class="mono">Mixtape · 2024</span><div class="links"><a class="btn" href="https://music.apple.com/mx/album/atp/1888034831" target="_blank" rel="noopener">Apple Music ↗</a><a class="btn" href="https://open.spotify.com/search/Nsqk%20ATP" target="_blank" rel="noopener">Spotify ↗</a></div></div>
+      <div class="listen-card"><img src="img/mosca.jpg" alt="" width="560" height="560" loading="lazy"><h3>mosca</h3><span class="mono">Álbum · 2026</span><div class="links"><a class="btn" href="https://music.apple.com/mx/album/mosca/6813620396" target="_blank" rel="noopener">Apple Music ↗</a><a class="btn" href="https://open.spotify.com/search/Nsqk%20mosca" target="_blank" rel="noopener">Spotify ↗</a></div></div>
+    </div>
+
+    <h2 class="sources-h">Fuentes</h2>
+    <ol class="sources">
+      <li><a href="https://en.wikipedia.org/wiki/Nsqk" target="_blank" rel="noopener">Wikipedia: Nsqk</a></li>
+      <li><a href="https://es.rollingstone.com/future-of-music-nsqk/" target="_blank" rel="noopener">Rolling Stone en Español: Future of Music</a></li>
+      <li><a href="https://es.rollingstone.com/en-atp-nsqk-manifiesta-su-madurez-versatilidad-y-gran-sentido-del-humor/" target="_blank" rel="noopener">Rolling Stone en Español: ATP</a></li>
+      <li><a href="https://www.thefamemag.com/article/fame-magazine-digital-cover-nsqks-rise-with-atp-and-u-s-tour-announcement" target="_blank" rel="noopener">FAME Magazine: portada digital</a></li>
+      <li><a href="https://www.elimparcial.com/espectaculos/2024/08/15/quien-es-nsqk-el-impacto-musical-de-su-nuevo-album-en-la-juventud/" target="_blank" rel="noopener">El Imparcial: ¿Quién es NSQK?</a></li>
+      <li><a href="https://thred.com/culture/who-is-nsqk-and-his-new-album-atp/" target="_blank" rel="noopener">Thred: NSQK y ATP</a></li>
+      <li><a href="https://aaldomejia.wordpress.com/2020/07/05/entrevista-nsqk/" target="_blank" rel="noopener">Entrevista de 2020 sobre Botánica</a></li>
+      <li><a href="https://acero.metalmagazine.eu/post/nsqk-incansable-y-ambicioso-hasta-la-medula" target="_blank" rel="noopener">Metal Magazine: incansable y ambicioso</a></li>
+      <li><a href="https://www.sopitas.com/?p=1648818" target="_blank" rel="noopener">Sopitas: ROY</a></li>
+      <li><a href="https://naufraghost.com/decepciones-y-aprendizajes-roy-el-album-debut-de-nsqk" target="_blank" rel="noopener">Naufraghost: ROY</a></li>
+      <li><a href="https://rockeando.net/viaje-a-traves-del-dolor-con-roy-de-nsqk/" target="_blank" rel="noopener">Rockeando: reseña de ROY</a></li>
+      <li><a href="https://grupoanimal.mx/entretenimiento/nsqk-mosca-nuevo-album" target="_blank" rel="noopener">Grupo Animal: anuncio de mosca</a></li>
+      <li><a href="https://www.telediario.mx/espectaculos/moscas-kafka-rock-nacio-mosca-album-nsqk" target="_blank" rel="noopener">Telediario: así nació mosca</a></li>
+      <li><a href="https://oscarglenn.com/37598/Explora-Nsqk-la-ambici%C3%B3n,-el-amor-y-la-transformaci%C3%B3n-en-las-17-canciones-de-Mosca" target="_blank" rel="noopener">Las 17 canciones de mosca</a></li>
+      <li><a href="https://www.songtell.com/nsqk" target="_blank" rel="noopener">SongTell: significados de canciones</a></li>
+      <li><a href="https://music.apple.com/mx/artist/nsqk/1480741185" target="_blank" rel="noopener">Apple Music: discografía y duraciones</a></li>
+    </ol>
+    <p class="credits">Hecho por fans, sin fines comerciales. Portadas y arte de sus respectivos dueños (Nsqk, Honey, Worldwide Records, No Pedí Permiso). Foto de 2021 por CapitanTick3, dominio público (CC0), vía Wikimedia Commons. Lo que dice cada canción resume entrevistas, reseñas y análisis publicados; cuando no hay una lectura confiable de la letra, la ficha se queda en los datos.</p>
+  </div>
+</footer>
+
+<div class="player" id="player" hidden>
+  <img class="pl-cover" id="plCover" src="img/botanica.jpg" alt="" width="52" height="52">
+  <div class="pl-info"><b id="plTitle">—</b><span class="mono" id="plAlbum">Muestra de 30 s</span><div class="pl-bar"><i></i></div></div>
+  <div class="pl-btns">
+    <button type="button" id="plToggle" aria-label="Pausar"></button>
+    <button type="button" id="plNext" aria-label="Siguiente canción"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.5 2.5v11l7-5.5zM10.5 2.5h2.5v11h-2.5z" fill="currentColor"/></svg></button>
+    <button type="button" id="plClose" aria-label="Cerrar reproductor"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const pad = n => String(n).padStart(2, '0');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const secs = d => { const [m, s] = d.split(':').map(Number); return m * 60 + s; };
+
+/* ---------------- datos ---------------- */
+const DATA = {
+  botanica: [
+    {t:"Árbol De Manzanas", d:"3:26", x:"Abre el EP con una petición: que la persona vuelva. La producción es sobria y la voz va subiendo de intensidad hasta el final."},
+    {t:"309", d:"3:34", x:"Como todo el EP, la escribió, la produjo y la cantó él solo. El número tiene eco: cuatro años después, Radio ATP, la estación ficticia de su mixtape, transmite en el 30.9."},
+    {t:"De Vez en Cuando (Aparece)", d:"3:01", x:"Una ruptura ya superada. Los recuerdos llegan de vez en cuando, pero llegan amables: sin rencor ni ganas de venganza, solo cariño."},
+    {t:"Tonos de Azul", d:"2:53", x:"Depender de alguien que ya se alejó. El silencio pesa, el ciclo cansa y lo único que quiere es salirse de su propia cabeza."},
+    {t:"¿Pa Qué La Hacemos De Pedo?", d:"2:36", x:"El título va en español mexicano sin filtro. En 2020 dijo que sabía que esa forma de hablar quizá no se entendería fuera de México, y que pensaba seguir escribiendo así."}
+  ],
+  roy: [
+    {t:"¿En Qué Momento?", d:"2:29", x:"Tener veintitantos y sentir que el tiempo se va rapidísimo. Abre el disco con el síndrome del impostor de frente."},
+    {t:"Cuando Me Vaya", d:"4:06", g:["single"], x:"La más personal del disco. Habla de la culpa de no ser quien se prometió ser y muchos la leen como una carta a su mamá. Él la ha descrito como una canción sobre los dolores de crecer."},
+    {t:"Torre 3", d:"2:30", x:"Alguien que se queda quieto mientras el amor se vuelve costumbre. Al final acepta, sin drama, que ya no se reconoce y que toca despedirse."},
+    {t:"Dientes", d:"3:27", x:"Una noche de insomnio: el cuerpo pide dormir y la mente no se apaga. Frente al espejo entiende que el que no se deja descansar es él. En mosca regresan los dientes, ahora «De Fierro»."},
+    {t:"Si En Tu Mente Estuve", d:"3:12", g:["single"], x:"Desamor directo: lo que se queda cuando alguien ya se fue. Fue el último sencillo de la era y de las más fáciles de cantar desde la primera vez."},
+    {t:"Sur (Interludio)", d:"1:48", g:["inter"], x:"Un respiro de menos de dos minutos con imágenes de naturaleza: aves que migran y flores de primavera."},
+    {t:"Algo Extraño", d:"2:55", x:"El momento más ligero del disco: vivir sin pensarlo tanto y ver qué sale."},
+    {t:"Ojeras", d:"3:42", x:"Desvelado, perdido y melancólico, buscando respuestas a deshoras. El título lo dice todo."},
+    {t:"Corazón : Classics", d:"4:35", g:["single"], x:"Tuvo una segunda vida como sencillo en marzo de 2023, con portada roja propia. Es de las más largas del disco."},
+    {t:"Antagonista", d:"3:27", x:"Ser tu propio peor enemigo y, aun así, el héroe de alguien. Otra vez la duda y el impostor."},
+    {t:"Moldes", d:"3:53", x:"Las expectativas que te heredan: carrera, trabajo estable, casa, viajes. Se siente perdido, pero confía en que todo va a salir bien. Sus papás querían que estudiara una carrera, y aquí se nota."},
+    {t:"El Tiempo Que Necesites", d:"3:07", x:"Cierra con un abrazo: cada quien va a su ritmo y hay tiempo de sobra."}
+  ],
+  atp: [
+    {t:"Radio ATP (skit)", d:"0:42", g:["skit"], x:"Arranca la transmisión. El streamer El Mariana es la voz de Radio ATP 30.9, la estación ficticia que conduce todo el disco."},
+    {t:"Aún Te Pienso", d:"1:48", x:"La canción que da nombre al disco. Rap y R&B melancólico: desearle lo mejor a alguien que ya no está, y la presión de que la música ahora sea su trabajo de tiempo completo."},
+    {t:"Cienciaficción", d:"3:53", x:"Una relación que pasa de ser real a ser un recuerdo idealizado. Culpa, distancia y ganas de reconciliarse; en el fondo extraña a la versión de sí mismo que era con esa persona."},
+    {t:"Tarde o temprano", d:"3:22", x:"Una de las tres que El Imparcial destacó del disco el día del estreno, junto con «si te portas bien» y «los alpes»."},
+    {t:"DJ Sísifo y sus favoritas de la semana (skit)", d:"1:06", g:["skit"], x:"Regresa Sísifo, el personaje de su sencillo «SÍSIFO / NADIE MÁS!». Nsqk se identifica con el mito porque al terminar cada disco siente que tiene que volver a empujar la piedra desde abajo."},
+    {t:"MIATA ᕙ(⇀‸↼‶)ᕗ", d:"3:00", f:"El Malilla", x:"Con El Malilla, una de las voces grandes del reguetón mexicano. Cruza R&B con reguetón, y el emoji del título es un bíceps en pose."},
+    {t:"BOBOMENSOTONTO", d:"3:01", f:"Easykid", x:"Con Easykid, a quien conoció en Lollapalooza. Le dio libertad total para meterse en la canción."},
+    {t:"rompecabezas (interludio)", d:"2:23", g:["inter"], x:"Una relación que parece encajar como pieza pero choca en todo: forma de ser, forma de hablar. El cansancio de querer a alguien con quien no te entiendes."},
+    {t:"misa", d:"2:21", g:["single"], x:"El adelanto del 31 de julio. Mete corrido y ranchera sobre baterías de funk, y dividió a su público a propósito."},
+    {t:"Escuchar a nsqk cambio mi vida (skit)", d:"1:43", g:["skit"], x:"Cápsula de comedia. Nsqk escribió casi todos los skits con colaboradores, y El Mariana les metió líneas y personalidad propias."},
+    {t:"MUBI", d:"2:41", f:"Álvaro Díaz", x:"Con el puertorriqueño Álvaro Díaz, pensada para él desde el principio. Ese mismo año Nsqk coescribió y apareció en «Mami 100pre Sabe», del disco <i>Sayonara</i> de Álvaro."},
+    {t:"Blamegame", d:"3:25", f:"paopao", g:["single"], x:"Con paopao. Salió como sencillo un día antes que el disco."},
+    {t:"Mi top 3 del nuevo disco de nsqk (skit)", d:"0:58", g:["skit"], x:"Otra pausa de la estación. Como los demás skits, prepara el ambiente de la canción que sigue."},
+    {t:"si te portas bien", d:"3:33", x:"Otra de las que la prensa destacó al estreno. Junto con «Tarde o temprano», es de los momentos con más energía de fin de semana del disco."},
+    {t:"los alpes", d:"3:21", f:"Nina", g:["single"], x:"Con Nina, la única colaboración que grabaron en el mismo cuarto; las demás fueron a distancia. Nina también compone corridos. Se vuelven a juntar en «tuffluv», de mosca."},
+    {t:"Nos vemos a la próxima (skit)", d:"0:30", g:["skit"], x:"La estación se despide antes de la última canción."},
+    {t:"RIP PETE", d:"2:38", x:"Cierra el disco. Nació de un sueño con su tío, que ya falleció, y se pregunta cuánto cuesta la fama."}
+  ],
+  mosca: [
+    {t:"SAMSA", d:"2:19", g:["kafka"], x:"Abre con Gregor Samsa, el protagonista de <i>La metamorfosis</i>. Ambición y ego: las ganas de crecer y dejar huella en la música mexicana. La escribió de gira en Buenos Aires."},
+    {t:"tuffluv", d:"2:52", f:"Nina", g:["single"], x:"Otra vez con Nina. Tener más dinero no arregla lo que traes por dentro: estabilidad material contra estabilidad emocional."},
+    {t:"Dientes De Fierro", d:"3:41", f:"Jean Dawson", g:["single"], x:"Con Jean Dawson, lo más cercano al punk y al rock alternativo del disco. Autodestrucción, pleitos internos y el final de una relación."},
+    {t:"Canonizado", d:"2:57", x:"Ambición, ego y la necesidad de que otros te validen, contra la confianza en uno mismo."},
+    {t:"Santurce", d:"3:16", x:"La muerte de su abuelo y la culpa de no haber llegado a tiempo para despedirse."},
+    {t:"Lo Tuvimos Pero Ya No Está", d:"4:40", f:"Riosse", g:["single"], x:"Con Riosse. Aceptar que algo terminó y extrañar lo que ya no está."},
+    {t:"¿Qué Tan Cerca Es Cerca?", d:"3:18", x:"Guitarras al frente. La distancia emocional y la duda de si se puede recuperar una conexión que ya cambió."},
+    {t:"Mil Problemas", d:"3:27", f:"Eslabon Armado", g:["single"], x:"Con Pedro Tovar, de Eslabon Armado. El vacío después de una ruptura y la manía de repetir lo que te hace daño, entre lo alternativo y el R&B."},
+    {t:"Hombre De Bien", d:"3:02", g:["single"], x:"El primer sencillo, del 3 de septiembre de 2026. Cambios, caos y pérdidas después de una ruptura, y la imagen que uno proyecta hacia afuera."},
+    {t:"SANGRE !", d:"3:49", x:"La canción más vieja del disco: esperaba su momento desde 2021. El amor como algo que deja heridas que no terminan de cerrar."},
+    {t:"Estar Así Siempre", d:"4:09", f:"Julieta Venegas", g:["single"], x:"Con Julieta Venegas, de quien dijo que «sabe hacer todo». Una pareja que se queda con lo que comparte sin hacer caso a lo de afuera; el momento más luminoso del disco."},
+    {t:"Peces Muertos", d:"3:58", x:"Una relación que se pudre despacio por la rutina mientras los dos fingen que todo está bien."},
+    {t:"No Basta Con Querernos Más", d:"3:19", x:"A veces el cariño no alcanza y separarse es lo más sano."},
+    {t:"Ghost In The Shell", d:"4:38", x:"Sentirse espectador de tu propia vida. Empieza tranquila y termina en electrónica distorsionada."},
+    {t:"Circo", d:"3:20", f:"Kevin Kaarl", g:["single"], x:"Con Kevin Kaarl, su «compa norteño», con quien ya había hecho «ULTRA SODADE». Amor no correspondido: querer que te elija alguien que no da lo mismo."},
+    {t:"Atrapado y Libre", d:"2:28", x:"Rock directo. El choque entre el éxito y la libertad: presión, expectativas y aislamiento."},
+    {t:"MARGOT", d:"5:51", g:["kafka"], x:"Cierra con su lado más vulnerable. Margot y Grete son diminutivos de Margarete: Grete es la hermana de Gregor Samsa, la que al principio lo cuida. Va de cuidarte y seguir tus sueños sin perder tu esencia."}
+  ]
+};
+const TAGS = {skit:"En cabina", inter:"Interludio", single:"Sencillo", kafka:"Kafka"};
+
+/* ---------------- listas de canciones ---------------- */
+const runtime = k => DATA[k].reduce((a, t) => a + secs(t.d), 0);
+const fmtRun = s => { const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60; return h ? `${h} h ${pad(m)} min` : `${m}:${pad(r)}`; };
+Object.keys(DATA).forEach(key => {
+  const host = $(`[data-tracks="${key}"]`);
+  if (!host) return;
+  const ol = document.createElement('ol');
+  ol.className = 'tracklist';
+  DATA[key].forEach((tr, i) => {
+    const li = document.createElement('li');
+    const g = tr.g || [];
+    li.className = 'trk' + (g.includes('skit') ? ' is-skit' : '');
+    li.dataset.n = i + 1;
+    const tags = g.map(x => `<span class="tag">${TAGS[x]}</span>`).join('');
+    const n = key === 'atp'
+      ? `<button class="preset" type="button" data-tune="${i + 1}" aria-label="Sintonizar ${esc(tr.t)}">${pad(i + 1)}</button>`
+      : `<span class="num">${pad(i + 1)}</span>`;
+    li.innerHTML = `<div class="trk-n">${n}</div><div class="trk-t"><span class="t">${esc(tr.t)}</span>${tags}${tr.f ? `<span class="feat">con ${esc(tr.f)}</span>` : ''}</div><p class="trk-x">${tr.x}</p><span class="trk-d">${tr.d}</span>`;
+    ol.appendChild(li);
+  });
+  host.appendChild(ol);
+  $$(`[data-runtime="${key}"]`).forEach(el => el.textContent = fmtRun(runtime(key)));
+});
+
+/* ---------------- visibilidad, barra y colores ---------------- */
+const nav = $('.eras-nav');
+const navNow = $('#navNow'), navText = $('#navNowText');
+const LABELS = {top: '4 eras · 2020–2026', botanica: 'Era 1 · Botánica · 2020', roy: 'Era 2 · ROY · 2022', atp: 'Era 3 · ATP · 2024', mosca: 'Era 4 · mosca · 2026'};
+const eras = $$('.era');
+const THEMES = {
+  top: ['#101014', '#eeebe4', '#eeebe4'],
+  botanica: ['#dbe5cb', '#1b3418', '#2a5fc4'],
+  roy: ['#141414', '#e8e7e3', '#d83b2f'],
+  atp: ['#ff6a13', '#1a0b02', '#1a0b02'],
+  mosca: ['#0c2c94', '#f2efe6', '#ff5f9e']
+};
+const visible = new Set();
+const onToggle = {};
+const io = new IntersectionObserver(entries => entries.forEach(e => {
+  const id = e.target.id;
+  if (e.isIntersecting) visible.add(id); else visible.delete(id);
+  e.target.classList.toggle('is-in', e.isIntersecting);
+  if (onToggle[id]) onToggle[id](e.isIntersecting);
+}), {rootMargin: '0px 0px -8% 0px'});
+[$('#top'), ...eras].forEach(s => io.observe(s));
+
+let current = '';
+const scrollHooks = [];
+function onScroll() {
+  const vh = innerHeight, probe = vh * 0.32;
+  let cur = 'top';
+  eras.forEach(s => { const r = s.getBoundingClientRect(); if (r.top <= probe && r.bottom > probe) cur = s.id; });
+  if (cur !== current) {
+    current = cur;
+    const th = THEMES[cur] || THEMES.top;
+    const rs = document.documentElement.style;
+    rs.setProperty('--nav-bg', th[0]); rs.setProperty('--nav-fg', th[1]); rs.setProperty('--nav-accent', th[2]);
+    navText.textContent = LABELS[cur] || LABELS.top;
+    navNow.classList.remove('swap'); void navNow.offsetWidth; navNow.classList.add('swap');
+  }
+  const a = eras[0].getBoundingClientRect().top + scrollY;
+  const b = eras[eras.length - 1].getBoundingClientRect().bottom + scrollY;
+  nav.style.setProperty('--p', clamp((scrollY + probe - a) / (b - a), 0, 1).toFixed(4));
+  scrollHooks.forEach(f => f());
+}
+let ticking = false;
+addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; onScroll(); }); } }, {passive: true});
+
+/* ---------------- inclinación 3D ---------------- */
+function tilt(el, max) {
+  if (!FINE || RM || !el) return;
+  el.addEventListener('pointermove', e => {
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    el.style.setProperty('--ry', (x * max).toFixed(2) + 'deg');
+    el.style.setProperty('--rx', (-y * max).toFixed(2) + 'deg');
+  });
+  el.addEventListener('pointerleave', () => { el.style.setProperty('--ry', '0deg'); el.style.setProperty('--rx', '0deg'); });
+}
+tilt($('#deck'), 14);
+$$('.sleeve').forEach(el => tilt(el, 16));
+
+/* ---------------- héroe: letras vivas + mosca ---------------- */
+const hero = $('#top');
+const letters = $$('.wordmark span');
+const lv = letters.map(() => .55);
+let hp = null;
+if (FINE) {
+  hero.addEventListener('pointermove', e => { hp = {x: e.clientX, y: e.clientY}; });
+  hero.addEventListener('pointerleave', () => { hp = null; });
+}
+function heroLetters(t) {
+  const rects = hp ? letters.map(el => el.getBoundingClientRect()) : null;
+  letters.forEach((el, i) => {
+    let f;
+    if (rects) { const r = rects[i]; const d = (hp.x - (r.left + r.width / 2)) / Math.max(r.width, 40); f = Math.exp(-d * d * .55); }
+    else f = .42 + .32 * Math.sin(t / 1100 - i * .85);
+    lv[i] += (f - lv[i]) * .08;
+    el.style.fontVariationSettings = `"wdth" ${(62 + 63 * lv[i]).toFixed(1)}, "wght" ${Math.round(300 + 600 * lv[i])}`;
+  });
+}
+const fly = $('#heroFly');
+const Q = letters[2];
+const F = {x: 0, y: 0, vx: 0, vy: 0, ang: 0, mode: 'land', wp: [], wait: 3 + Math.random() * 3};
+function qSpot() {
+  const hr = hero.getBoundingClientRect(), r = Q.getBoundingClientRect();
+  return {x: r.left - hr.left + r.width * .6, y: r.top - hr.top + r.height * .1};
+}
+function takeOff(away) {
+  const hr = hero.getBoundingClientRect();
+  F.wp = [];
+  for (let i = 0; i < 3; i++) {
+    let x = hr.width * (.06 + Math.random() * .88), y = hr.height * (.08 + Math.random() * .8);
+    if (away && i === 0) { x = clamp(F.x + (F.x - away.x) * 3 + (Math.random() - .5) * 160, 20, hr.width - 20); y = clamp(F.y + (F.y - away.y) * 3 + (Math.random() - .5) * 120, 20, hr.height - 20); }
+    F.wp.push({x, y});
+  }
+  F.wp.push('home');
+  F.mode = 'fly';
+  fly.classList.remove('landed');
+}
+function placeFly() { fly.style.transform = `translate(${F.x.toFixed(1)}px,${F.y.toFixed(1)}px) rotate(${F.ang.toFixed(1)}deg)`; }
+function flyStep(dt, t) {
+  const home = qSpot();
+  if (F.mode === 'land') {
+    F.x = home.x; F.y = home.y;
+    F.ang += ((-12 + Math.sin(t / 700) * 4) - F.ang) * .1;
+    F.wait -= dt;
+    let near = false;
+    if (hp) { const hr = hero.getBoundingClientRect(); near = Math.hypot(hp.x - hr.left - F.x, hp.y - hr.top - F.y) < 110; }
+    if (near) takeOff(hp ? {x: hp.x - hero.getBoundingClientRect().left, y: hp.y - hero.getBoundingClientRect().top} : null);
+    else if (F.wait <= 0) takeOff(null);
+  } else {
+    const target = F.wp[0] === 'home' ? home : F.wp[0];
+    const dx = target.x - F.x, dy = target.y - F.y, d = Math.hypot(dx, dy) || 1;
+    const sp = F.wp[0] === 'home' ? Math.min(380, 40 + d * 3) : 420;
+    const wob = Math.sin(t / 55) * 140;
+    const dvx = dx / d * sp - dy / d * wob, dvy = dy / d * sp + dx / d * wob;
+    F.vx += (dvx - F.vx) * Math.min(1, dt * 5); F.vy += (dvy - F.vy) * Math.min(1, dt * 5);
+    F.x += F.vx * dt; F.y += F.vy * dt;
+    F.ang = Math.atan2(F.vy, F.vx) * 180 / Math.PI + 90;
+    if (F.wp[0] === 'home' ? d < 5 : d < 34) {
+      F.wp.shift();
+      if (!F.wp.length) { F.mode = 'land'; F.vx = F.vy = 0; F.wait = 4 + Math.random() * 5; fly.classList.add('landed'); }
+    }
+  }
+  placeFly();
+}
+function restFly() { const h = qSpot(); F.x = h.x; F.y = h.y; F.ang = -12; placeFly(); }
+
+/* ---------------- Botánica: enredaderas ---------------- */
+const vCv = $('#vines'), vctx = vCv.getContext('2d');
+let VW = 0, VH = 0, stems = [];
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function buildVines() {
+  const dpr = Math.min(devicePixelRatio || 1, 1.5);
+  VW = innerWidth; VH = innerHeight;
+  vCv.width = VW * dpr; vCv.height = VH * dpr; vctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const R = mulberry(20200131);
+  const band = Math.min(150, VW * .12);
+  let starts = [{x: band * .35, up: 1}, {x: band * .85, up: 1}, {x: VW - band * .4, up: 1}, {x: VW - band * .9, up: 1}, {x: band * .55, up: 0}, {x: VW - band * .6, up: 0}];
+  if (VW < 700) starts = [starts[0], starts[2], starts[4], starts[5]];
+  stems = starts.map(s => {
+    const len = VH * (s.up ? .5 + R() * .42 : .22 + R() * .26), step = 5, n = Math.floor(len / step);
+    const amp = band * (.22 + R() * .32), fr = .012 + R() * .018, ph = R() * 6.28;
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const y = s.up ? VH + 4 - i * step : -4 + i * step;
+      pts.push([s.x + Math.sin(i * step * fr + ph) * amp * (.25 + .75 * i / n), y]);
+    }
+    const leaves = [];
+    for (let i = 5; i < n; i += 6 + Math.floor(R() * 7)) leaves.push({i, side: leaves.length % 2 ? 1 : -1, size: 7 + R() * 11, tone: R()});
+    return {pts, leaves, delay: R() * .18, flower: R() < .75, fc: R() < .5 ? '#2a5fc4' : '#e2ad35'};
+  });
+}
+function leaf(x, y, a, s, col) {
+  if (s < .5) return;
+  vctx.save(); vctx.translate(x, y); vctx.rotate(a);
+  vctx.beginPath(); vctx.moveTo(0, 0);
+  vctx.quadraticCurveTo(s * .5, -s * .45, s, 0); vctx.quadraticCurveTo(s * .5, s * .45, 0, 0);
+  vctx.fillStyle = col; vctx.fill(); vctx.restore();
+}
+function drawVines(p) {
+  vctx.clearRect(0, 0, VW, VH);
+  stems.forEach(st => {
+    const q = clamp((p - st.delay) / (1 - st.delay), 0, 1);
+    const n = Math.floor((st.pts.length - 1) * q);
+    if (n < 2) return;
+    vctx.beginPath(); vctx.moveTo(st.pts[0][0], st.pts[0][1]);
+    for (let i = 1; i <= n; i++) vctx.lineTo(st.pts[i][0], st.pts[i][1]);
+    vctx.strokeStyle = 'rgba(38,74,32,.45)'; vctx.lineWidth = 1.8; vctx.lineCap = 'round'; vctx.stroke();
+    st.leaves.forEach(l => {
+      if (l.i > n) return;
+      const g = clamp((n - l.i) / 12, 0, 1);
+      const [x, y] = st.pts[l.i], [x2, y2] = st.pts[Math.min(l.i + 1, st.pts.length - 1)];
+      leaf(x, y, Math.atan2(y2 - y, x2 - x) + l.side * .95, l.size * g, l.tone < .5 ? 'rgba(72,122,58,.5)' : 'rgba(118,158,90,.48)');
+    });
+    if (st.flower && q > .94) {
+      const [x, y] = st.pts[n], r = 4.2 * clamp((q - .94) / .06, 0, 1);
+      vctx.globalAlpha = .8; vctx.fillStyle = st.fc;
+      for (let k = 0; k < 5; k++) { const a = k * 1.2566; vctx.beginPath(); vctx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r, r * .72, 0, 6.283); vctx.fill(); }
+      vctx.globalAlpha = 1; vctx.fillStyle = '#f4e9c4'; vctx.beginPath(); vctx.arc(x, y, r * .45, 0, 6.283); vctx.fill();
+    }
+  });
+}
+let lastP = -1;
+function vinesScroll() {
+  if (!visible.has('botanica')) return;
+  const r = $('#botanica').getBoundingClientRect();
+  const p = RM ? 1 : clamp((innerHeight - r.top) / (r.height * .78), 0, 1);
+  if (Math.abs(p - lastP) > .002) { lastP = p; drawVines(p); }
+}
+scrollHooks.push(vinesScroll);
+onToggle.botanica = on => { if (on) { lastP = -1; vinesScroll(); } };
+
+/* ---------------- ROY: grano + título con foto ---------------- */
+(function grain() {
+  const c = document.createElement('canvas'); c.width = c.height = 150;
+  const x = c.getContext('2d'), im = x.createImageData(150, 150);
+  for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() * 255 | 0; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+  x.putImageData(im, 0, 0);
+  $('#grain').style.backgroundImage = `url(${c.toDataURL()})`;
+})();
+const rt = $('.roy-title'), ghost = $('.roy-ghost'), royDark = $('#royDark');
+const spot = {x: innerWidth * .7, y: innerHeight * .4, tx: innerWidth * .7, ty: innerHeight * .4, last: -1e9};
+if (!RM) {
+  $('#roy').addEventListener('pointermove', e => {
+    spot.tx = e.clientX; spot.ty = e.clientY; spot.last = performance.now();
+    if (!FINE) return;
+    const nx = e.clientX / innerWidth - .5, ny = e.clientY / innerHeight - .5;
+    rt.style.setProperty('--bx', (50 + nx * 50).toFixed(1) + '%');
+    rt.style.setProperty('--by', (40 + ny * 45).toFixed(1) + '%');
+    ghost.style.setProperty('--gx', (-nx * 32).toFixed(1) + 'px');
+    ghost.style.setProperty('--gy', (-ny * 22).toFixed(1) + 'px');
+  });
+}
+function spotStep(t) {
+  if (t - spot.last > 2500) { spot.tx = innerWidth * (.55 + .3 * Math.sin(t / 3100)); spot.ty = innerHeight * (.45 + .28 * Math.sin(t / 2300 + 1)); }
+  spot.x += (spot.tx - spot.x) * .07; spot.y += (spot.ty - spot.y) * .07;
+  royDark.style.setProperty('--mx', spot.x.toFixed(0) + 'px');
+  royDark.style.setProperty('--my', spot.y.toFixed(0) + 'px');
+}
+let bandRate = 1, lastSY = scrollY, bandAnims = null;
+function bandStep() {
+  if (!bandAnims) bandAnims = $$('.band-track, .led-track').map(el => el.getAnimations()[0]).filter(Boolean);
+  const v = scrollY - lastSY; lastSY = scrollY;
+  const target = Math.abs(v) < .5 ? 1 : Math.sign(v) * (1 + Math.min(9, Math.abs(v) * .35));
+  bandRate += (target - bandRate) * .08;
+  bandAnims.forEach(a => { a.playbackRate = bandRate; });
+}
+
+/* ---------------- ATP: el radio ---------------- */
+const tuner = $('#tuner'), lcd = $('#lcd'), sc = $('#lcd canvas'), sctx = sc.getContext('2d');
+$('#ticks').innerHTML = DATA.atp.map(t => `<i class="${(t.g || []).includes('skit') ? 's' : ''}"></i>`).join('');
+let burstUntil = 0, sraf = 0;
+function noise() {
+  const im = sctx.createImageData(160, 56);
+  for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() * 255 | 0; im.data[i] = v; im.data[i + 1] = v * .72 | 0; im.data[i + 2] = v * .38 | 0; im.data[i + 3] = 255; }
+  sctx.putImageData(im, 0, 0);
+}
+function staticLoop(t) { noise(); if (t < burstUntil) sraf = requestAnimationFrame(staticLoop); else { sraf = 0; lcd.classList.remove('is-static'); } }
+function burst() { if (RM) return; burstUntil = performance.now() + 240; lcd.classList.add('is-static'); if (!sraf) sraf = requestAnimationFrame(staticLoop); }
+let tuneTimer = 0;
+const atpRows = () => $$('[data-tracks="atp"] .trk');
+function setStation(n, quiet) {
+  n = clamp(n, 1, 17);
+  tuner.value = n;
+  if (!quiet) { burst(); radioTune(n); }
+  clearTimeout(tuneTimer);
+  const apply = () => {
+    const tr = DATA.atp[n - 1], g = tr.g || [];
+    $('#lcdNum').textContent = `Pista ${pad(n)} / 17`;
+    $('#lcdTitle').textContent = tr.t;
+    $('#lcdSub').textContent = g.includes('skit') ? `En cabina: El Mariana · ${tr.d}` : `${tr.f ? 'Nsqk con ' + tr.f : 'Nsqk'} · ${tr.d}`;
+    $('#radioNote').innerHTML = tr.x;
+    atpRows().forEach(r => r.classList.toggle('is-on', +r.dataset.n === n));
+  };
+  if (quiet || RM) apply(); else tuneTimer = setTimeout(apply, 170);
+}
+tuner.addEventListener('input', () => setStation(+tuner.value));
+$('#prevSt').addEventListener('click', () => setStation(+tuner.value - 1));
+$('#nextSt').addEventListener('click', () => setStation(+tuner.value + 1));
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-tune]');
+  if (!b) return;
+  if (audioOK) radioOn = true;
+  setStation(+b.dataset.tune);
+  if (matchMedia('(max-width: 960px)').matches) $('#radio').scrollIntoView({behavior: RM ? 'auto' : 'smooth', block: 'center'});
+});
+setStation(2, true);
+
+/* ---------------- mosca: el enjambre ---------------- */
+const fc = $('#flies'), fx = fc.getContext('2d');
+let FW = 0, FH = 0;
+const flies = [];
+const mp = {x: -9999, y: -9999};
+addEventListener('pointermove', e => { mp.x = e.clientX; mp.y = e.clientY; }, {passive: true});
+addEventListener('pointerdown', e => { mp.x = e.clientX; mp.y = e.clientY; }, {passive: true});
+function sizeFlies() {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  FW = innerWidth; FH = innerHeight;
+  fc.width = FW * dpr; fc.height = FH * dpr; fx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function initFlies() {
+  flies.length = 0;
+  const n = FW < 700 ? 7 : 13;
+  for (let i = 0; i < n; i++) flies.push({x: Math.random() * FW, y: Math.random() * FH, vx: 0, vy: 0, a: Math.random() * 6.28, ang: Math.random() * 6.28, ph: Math.random() * 10, land: Math.random() * 2.5, s: .85 + Math.random() * .55});
+}
+function drawFly(f, t) {
+  const flying = f.land <= 0;
+  fx.save(); fx.translate(f.x, f.y); fx.rotate(f.ang); fx.scale(f.s, f.s);
+  for (const side of [-1, 1]) {
+    fx.save(); fx.translate(1, 0);
+    fx.rotate(side * (flying ? 2.25 + .55 * Math.sin(t * .13 + f.ph) : 2.8));
+    fx.beginPath(); fx.ellipse(6, 0, 6.6, 2.6, 0, 0, 6.283);
+    fx.fillStyle = flying ? 'rgba(222,230,255,.3)' : 'rgba(222,230,255,.45)'; fx.fill();
+    fx.restore();
+  }
+  fx.fillStyle = '#050817';
+  fx.beginPath(); fx.ellipse(-1, 0, 6.4, 3.6, 0, 0, 6.283); fx.fill();
+  fx.beginPath(); fx.arc(6, 0, 2.9, 0, 6.283); fx.fill();
+  fx.fillStyle = '#8c2233';
+  fx.beginPath(); fx.arc(7, -1.6, 1.3, 0, 6.283); fx.arc(7, 1.6, 1.3, 0, 6.283); fx.fill();
+  fx.restore();
+}
+function fliesStep(dt, t) {
+  fx.clearRect(0, 0, FW, FH);
+  const hype = (nowAlbum === 'mosca' && !audio.paused) ? 1.8 : 1;
+  flies.forEach(f => {
+    const dx = f.x - mp.x, dy = f.y - mp.y, d = Math.hypot(dx, dy) || 1;
+    if (f.land > 0) { f.land -= dt; if (d < 130) f.land = 0; }
+    if (f.land <= 0) {
+      f.a += (Math.random() - .5) * 10 * dt;
+      let ax = Math.cos(f.a) * 950 * hype, ay = Math.sin(f.a) * 950 * hype;
+      if (d < 170) { const k = (1 - d / 170) * 5600; ax += dx / d * k; ay += dy / d * k; }
+      const m = 50;
+      if (f.x < m) ax += 1500; if (f.x > FW - m) ax -= 1500; if (f.y < m) ay += 1500; if (f.y > FH - m) ay -= 1500;
+      f.vx += ax * dt; f.vy += ay * dt;
+      const damp = Math.pow(.07, dt); f.vx *= damp; f.vy *= damp;
+      const sp = Math.hypot(f.vx, f.vy), max = d < 170 ? 640 : 300 * hype;
+      if (sp > max) { f.vx *= max / sp; f.vy *= max / sp; }
+      f.x += f.vx * dt; f.y += f.vy * dt;
+      if (sp > 20) f.ang = Math.atan2(f.vy, f.vx);
+      if (d > 230 && Math.random() < .25 * dt / hype) { f.land = .7 + Math.random() * 2.4; f.vx = f.vy = 0; }
+    }
+    drawFly(f, t);
+  });
+}
+function staticFlies() { fx.clearRect(0, 0, FW, FH); flies.forEach(f => { f.land = 1; drawFly(f, 0); }); }
+onToggle.mosca = on => { if (!on) fx.clearRect(0, 0, FW, FH); else if (RM) staticFlies(); };
+
+/* ---------------- música: muestras oficiales de 30 s (Apple) ----------------
+   Solo se activan si el navegador puede cargarlas. En la página publicada en
+   claude.ai el audio externo está bloqueado, así que ahí no aparece ningún botón. */
+const PREVIEW_BASE = "https://audio-ssl.itunes.apple.com/itunes-assets/";
+const PREVIEWS = {
+  botanica: ["AudioPreview221/v4/b9/88/ce/b988ce51-4bc3-7669-a98c-0e9a3cec5c43/mzaf_17060040881404441432.plus.aac.p.m4a","AudioPreview211/v4/86/27/87/8627875f-b0b7-6af7-c769-ec66af12cb3a/mzaf_15343894099020190898.plus.aac.p.m4a","AudioPreview221/v4/98/0c/19/980c1976-534e-de94-d00a-3fcfec72a76a/mzaf_11174854181240691477.plus.aac.p.m4a","AudioPreview211/v4/6b/4b/c5/6b4bc512-1db6-5c96-9157-06800e24b76b/mzaf_10920364470469661971.plus.aac.p.m4a","AudioPreview211/v4/00/c0/c6/00c0c60d-bd99-a41a-9bc3-d1af6fe1ea17/mzaf_655714450680366938.plus.aac.p.m4a"],
+  roy: ["AudioPreview221/v4/e4/5c/07/e45c07f8-35ca-9ef7-9972-adf4bbbf77d2/mzaf_8937717203784430830.plus.aac.p.m4a","AudioPreview211/v4/a8/cb/2e/a8cb2eb9-9a08-95d5-e7bb-5c8ce8cb135e/mzaf_16630900761428197812.plus.aac.p.m4a","AudioPreview221/v4/eb/6a/c4/eb6ac437-6d2d-695f-5c55-d26f2a9c7d91/mzaf_9998333475687185127.plus.aac.p.m4a","AudioPreview211/v4/e9/d4/cb/e9d4cb17-4a51-5d8d-7535-b62b956986dd/mzaf_4376656564681709393.plus.aac.p.m4a","AudioPreview221/v4/59/fd/98/59fd98af-8275-d365-3447-e3cf51d1b0a4/mzaf_4380528240417055264.plus.aac.p.m4a","AudioPreview211/v4/60/1d/35/601d35aa-fe4d-7673-0688-350a3584522e/mzaf_10153052659685841066.plus.aac.p.m4a","AudioPreview211/v4/1b/46/da/1b46da6e-66ec-00f8-7d32-b566270686ef/mzaf_17311835324892126413.plus.aac.p.m4a","AudioPreview221/v4/24/67/f8/2467f8d0-2929-544c-4213-7f59fab38c99/mzaf_14647818627755761448.plus.aac.p.m4a","AudioPreview221/v4/4d/d0/ee/4dd0ee75-00b4-754f-7553-3cef6a77a779/mzaf_9648365896409529860.plus.aac.p.m4a","AudioPreview211/v4/46/76/48/467648d4-216a-d2bc-a07b-1e915b4d0c18/mzaf_3086086560849638648.plus.aac.p.m4a","AudioPreview221/v4/eb/21/44/eb2144c2-e5f2-e27f-d4e1-9be3c160f003/mzaf_6647367776732015806.plus.aac.p.m4a","AudioPreview211/v4/bb/3c/1c/bb3c1c27-b284-66e1-f8e2-ea5d1e63f50a/mzaf_2247698880287309612.plus.aac.p.m4a"],
+  atp: ["AudioPreview211/v4/da/6b/bb/da6bbb34-a562-55e9-8116-752351652626/mzaf_10020411549517079176.plus.aac.p.m4a","AudioPreview211/v4/7f/65/6b/7f656b01-6db4-ff8c-71c6-3f1bf1d7e24f/mzaf_7595635106781117107.plus.aac.p.m4a","AudioPreview221/v4/71/e6/e4/71e6e4bd-fc03-7696-a39c-2c832d4c339d/mzaf_14858547869928293205.plus.aac.p.m4a","AudioPreview211/v4/50/ce/1a/50ce1ac9-4cc5-8807-76df-96c5e3e6cde3/mzaf_15659450909952939831.plus.aac.p.m4a","AudioPreview221/v4/0a/1d/3e/0a1d3ebb-6665-9071-57d3-ff77f43057b5/mzaf_8377888535884061248.plus.aac.p.m4a","AudioPreview211/v4/ad/6f/cf/ad6fcff6-e3d4-d277-d73a-6febd5d89648/mzaf_3345312678358866386.plus.aac.p.m4a","AudioPreview221/v4/af/8a/14/af8a1493-aa03-c0a0-5b56-52a44fe3e8c5/mzaf_13669026282285385868.plus.aac.p.m4a","AudioPreview221/v4/12/15/a2/1215a238-1370-cbcb-62fb-5b38dbd81a24/mzaf_6965573523909336613.plus.aac.p.m4a","AudioPreview211/v4/f9/73/1f/f9731f27-41b5-7054-fc2c-8d9eb381945d/mzaf_5776991297625392480.plus.aac.p.m4a","AudioPreview211/v4/0c/dc/88/0cdc8889-2401-84b6-2b23-fe511787bdfe/mzaf_214239068038685770.plus.aac.p.m4a","AudioPreview211/v4/2a/c7/03/2ac703bc-37e6-4996-9a99-05b88556ca45/mzaf_10117645809075437588.plus.aac.p.m4a","AudioPreview211/v4/34/c0/07/34c00702-66a1-e6b2-1c63-94efdffdfde9/mzaf_14598337988915623542.plus.aac.p.m4a","AudioPreview221/v4/39/fa/1e/39fa1e89-3229-c4b5-bcb3-545aabc586b9/mzaf_6706871846731130593.plus.aac.p.m4a","AudioPreview211/v4/10/c7/cf/10c7cf30-f4f1-25a2-0cde-9932e314a3f5/mzaf_6028216157568517150.plus.aac.p.m4a","AudioPreview221/v4/78/c1/df/78c1df3b-2119-d166-7b28-969dd9ef211b/mzaf_13915061793540055009.plus.aac.p.m4a","AudioPreview221/v4/bf/b7/0b/bfb70b04-692a-da56-d0f1-8900497b51e5/mzaf_404615564875529405.plus.aac.p.m4a","AudioPreview221/v4/bf/47/3f/bf473f0c-00c0-3c13-6a67-9de94e533951/mzaf_580109203565100215.plus.aac.p.m4a"],
+  mosca: ["AudioPreview221/v4/63/1c/d3/631cd37c-db99-0d1e-ffd1-9bb08c6f626f/mzaf_7087822967002747469.plus.aac.p.m4a","AudioPreview211/v4/28/fd/43/28fd43ed-cc1a-0896-2c66-5ca3da494b58/mzaf_6266736102118689990.plus.aac.p.m4a","AudioPreview221/v4/fe/25/76/fe2576af-8158-a8da-ef62-99f267990857/mzaf_11510053310359128977.plus.aac.p.m4a","AudioPreview221/v4/ad/df/62/addf6294-8daf-1650-287d-3d3b758f2d15/mzaf_7346929542249208961.plus.aac.p.m4a","AudioPreview221/v4/d1/d2/55/d1d255b4-2d94-0722-b933-b91c60362a16/mzaf_2105324170235176036.plus.aac.p.m4a","AudioPreview221/v4/e0/1a/ec/e01aecde-99ec-00de-561b-f4b6c6803c09/mzaf_26863507561659895.plus.aac.p.m4a","AudioPreview221/v4/be/51/8f/be518f6c-3d90-fa1f-14d3-cc7de57100d5/mzaf_3761370052670638915.plus.aac.p.m4a","AudioPreview221/v4/ef/e4/30/efe43072-23c5-d4a7-f589-3faf3b6f3e9e/mzaf_16423932863954870163.plus.aac.p.m4a","AudioPreview221/v4/72/ce/32/72ce3265-1b2f-8b27-8e4f-6391c8105325/mzaf_8380928652387898048.plus.aac.p.m4a","AudioPreview211/v4/51/1f/19/511f196a-747d-9d14-bea0-2c05bb92488b/mzaf_11917878914991754513.plus.aac.p.m4a","AudioPreview211/v4/f3/d0/98/f3d09815-d4e3-c8e1-b8e1-b6d3f06493e0/mzaf_683959178055163174.plus.aac.p.m4a","AudioPreview211/v4/a3/3d/61/a33d6168-be10-6457-dcee-4f79e22e8884/mzaf_1522526958931841999.plus.aac.p.m4a","AudioPreview221/v4/d6/c8/5c/d6c85c8c-6d0b-e366-5490-c3e332a23f62/mzaf_17258478122800267151.plus.aac.p.m4a","AudioPreview211/v4/99/fb/f3/99fbf317-5735-731e-c611-04623770f3ab/mzaf_1736626504599905112.plus.aac.p.m4a","AudioPreview211/v4/bd/18/77/bd1877a6-4682-c839-9f07-660807273c0e/mzaf_5801484089525312097.plus.aac.p.m4a","AudioPreview221/v4/ab/e6/e7/abe6e7da-22d7-c8a5-b5e3-e75b3380cb08/mzaf_7780050183355673570.plus.aac.p.m4a","AudioPreview221/v4/bf/1f/39/bf1f393d-ca3e-c251-0735-589a2f7b8442/mzaf_14146848002659348208.plus.aac.p.m4a"]
+};
+const ALBUM_NAME = {botanica: 'Botánica', roy: 'ROY', atp: 'ATP', mosca: 'mosca'};
+const ALBUM_COLOR = {botanica: '#b9d39c', roy: '#d83b2f', atp: '#ff6a13', mosca: '#ff5f9e'};
+const ICON = {
+  play: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>',
+  pause: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z" fill="currentColor"/></svg>'
+};
+const audio = new Audio();
+audio.preload = 'none';
+const player = $('#player'), plToggle = $('#plToggle');
+let audioOK = false, nowAlbum = null, nowIdx = -1, radioOn = false, stationTimer = 0, actx = null;
+const rowsOf = k => $$(`[data-tracks="${k}"] .trk`);
+
+function enableAudio() {
+  audioOK = true;
+  document.documentElement.classList.add('has-audio');
+  ['botanica', 'roy', 'mosca'].forEach(k => rowsOf(k).forEach((li, i) => {
+    $('.trk-n', li).innerHTML = `<button class="play" type="button" data-play="${k}:${i}" aria-label="Escuchar 30 segundos de ${esc(DATA[k][i].t)}"><span class="num">${pad(i + 1)}</span><span class="pi">${ICON.play}</span><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></button>`;
+  }));
+}
+fetch(PREVIEW_BASE + PREVIEWS.botanica[0], {method: 'HEAD', mode: 'no-cors', cache: 'no-store'}).then(enableAudio, () => {});
+
+function playStatic() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const len = Math.floor(actx.sampleRate * .3), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 1900; f.Q.value = .7; g.gain.value = .06;
+    src.connect(f).connect(g).connect(actx.destination); src.start();
+  } catch (e) { /* sin estática, no pasa nada */ }
+}
+function play(k, i, force) {
+  if (!audioOK) return;
+  if (k !== 'atp') radioOn = false;
+  const same = k === nowAlbum && i === nowIdx && audio.getAttribute('src');
+  if (same && !force) { if (audio.paused) audio.play().catch(() => {}); else audio.pause(); return; }
+  if (same && force) { if (audio.paused) audio.play().catch(() => {}); return; }
+  nowAlbum = k; nowIdx = i;
+  audio.src = PREVIEW_BASE + PREVIEWS[k][i];
+  audio.play().catch(() => {});
+  paint();
+}
+function radioTune(n) {
+  if (!audioOK || !radioOn) return;
+  playStatic();
+  clearTimeout(stationTimer);
+  stationTimer = setTimeout(() => play('atp', n - 1, true), 280);
+}
+function next() {
+  if (!nowAlbum) return;
+  const n = (nowIdx + 1) % PREVIEWS[nowAlbum].length;
+  if (nowAlbum === 'atp') { radioOn = true; setStation(n + 1); } else play(nowAlbum, n, true);
+}
+function paintRadio() {
+  const live = radioOn && nowAlbum === 'atp' && !audio.paused;
+  $('#radio').classList.toggle('is-live', live);
+  const pb = $('#powerBtn');
+  pb.textContent = live ? '■ Apagar' : '▶ Encender';
+  pb.setAttribute('aria-pressed', String(live));
+}
+function paint() {
+  $$('.trk.is-playing').forEach(r => { r.classList.remove('is-playing', 'is-paused'); r.style.removeProperty('--pp'); });
+  $$('.era.is-playing').forEach(s => s.classList.remove('is-playing'));
+  const paused = audio.paused;
+  $('#atp').classList.toggle('on-air', nowAlbum === 'atp' && !paused);
+  paintRadio();
+  if (!nowAlbum) { player.hidden = true; document.documentElement.classList.remove('has-player'); return; }
+  const row = rowsOf(nowAlbum)[nowIdx];
+  if (row) { row.classList.add('is-playing'); row.classList.toggle('is-paused', paused); }
+  if (!paused) $('#' + nowAlbum).classList.add('is-playing');
+  const tr = DATA[nowAlbum][nowIdx];
+  player.hidden = false;
+  document.documentElement.classList.add('has-player');
+  player.style.setProperty('--pc', ALBUM_COLOR[nowAlbum]);
+  player.classList.toggle('is-playing', !paused);
+  $('#plCover').src = `img/${nowAlbum}.jpg`;
+  $('#plTitle').textContent = tr.t;
+  $('#plAlbum').textContent = `${ALBUM_NAME[nowAlbum]} · muestra de 30 s · Apple Music`;
+  plToggle.innerHTML = paused ? ICON.play : ICON.pause;
+  plToggle.setAttribute('aria-label', paused ? 'Reproducir' : 'Pausar');
+}
+audio.addEventListener('play', paint);
+audio.addEventListener('pause', paint);
+audio.addEventListener('ended', next);
+audio.addEventListener('timeupdate', () => {
+  const p = audio.duration ? (audio.currentTime / audio.duration).toFixed(3) : 0;
+  player.style.setProperty('--pp', p);
+  const row = nowAlbum && rowsOf(nowAlbum)[nowIdx];
+  if (row) row.style.setProperty('--pp', p);
+});
+audio.addEventListener('error', () => { if (nowAlbum && audio.getAttribute('src')) $('#plAlbum').textContent = 'No se pudo cargar esta muestra. Revisa tu conexión.'; });
+document.addEventListener('click', e => {
+  if (!audioOK) return;
+  const pb = e.target.closest('[data-play]');
+  const row = e.target.closest('.trk');
+  if (pb) { const [k, i] = pb.dataset.play.split(':'); play(k, +i); return; }
+  if (row && !e.target.closest('a, button') && !row.closest('[data-tracks="atp"]')) { const b = $('[data-play]', row); if (b) b.click(); }
+});
+$('#powerBtn').addEventListener('click', () => {
+  const live = radioOn && nowAlbum === 'atp' && !audio.paused;
+  if (live) { radioOn = false; audio.pause(); }
+  else { radioOn = true; playStatic(); play('atp', +tuner.value - 1, true); }
+  paintRadio();
+});
+plToggle.addEventListener('click', () => { if (audio.paused) audio.play().catch(() => {}); else audio.pause(); });
+$('#plNext').addEventListener('click', next);
+$('#plClose').addEventListener('click', () => { audio.pause(); radioOn = false; nowAlbum = null; nowIdx = -1; audio.removeAttribute('src'); audio.load(); paint(); });
+
+/* ---------------- contadores ---------------- */
+const cio = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  cio.unobserve(e.target);
+  if (RM) return;
+  const el = e.target, raw = el.dataset.count, to = parseFloat(raw), dec = (raw.split('.')[1] || '').length, suf = el.dataset.suf || '';
+  const t0 = performance.now();
+  (function step(t) { const k = Math.min(1, (t - t0) / 1200), v = to * (1 - Math.pow(1 - k, 3)); el.textContent = v.toFixed(dec) + suf; if (k < 1) requestAnimationFrame(step); })(t0);
+}), {threshold: .6});
+$$('[data-count]').forEach(el => cio.observe(el));
+
+/* ---------------- arranque ---------------- */
+function resize() { buildVines(); lastP = -1; sizeFlies(); if (!flies.length) initFlies(); if (RM) { restFly(); if (visible.has('mosca')) staticFlies(); } onScroll(); }
+let rz = 0;
+addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(resize, 120); });
+resize();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (RM) restFly(); });
+if (!RM) {
+  let last = performance.now();
+  const loop = t => {
+    const dt = Math.min(.05, (t - last) / 1000); last = t;
+    if (visible.has('top')) { heroLetters(t); flyStep(dt, t); }
+    if (visible.has('mosca')) fliesStep(dt, t);
+    if (visible.has('roy')) spotStep(t);
+    if (visible.has('roy') || visible.has('atp')) bandStep(); else lastSY = scrollY;
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+} else restFly();
+})();
+</script>
+</body>
+</html>
