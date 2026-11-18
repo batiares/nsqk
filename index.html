@@ -68,7 +68,12 @@ p{margin:0}
 /* ---------- NAV ---------- */
 .eras-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--nav-bg);color:var(--nav-fg);transition:background-color .6s,color .6s}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:2.75rem}
-.nav-mark{font-family:var(--display);font-weight:900;font-variation-settings:"wdth" 125,"wght" 900;font-size:1.05rem;letter-spacing:.02em}
+.nav-mark{font-family:var(--display);font-weight:900;font-variation-settings:"wdth" 125,"wght" 900;font-size:1.05rem;letter-spacing:.02em;background:none;border:0;padding:0;color:inherit;cursor:pointer}
+.to-top{position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:35;display:inline-flex;align-items:center;gap:.45rem;padding:.62rem .9rem .62rem .75rem;border-radius:999px;border:1px solid color-mix(in srgb, var(--nav-fg) 25%, transparent);background:var(--nav-bg);color:var(--nav-fg);font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;box-shadow:0 12px 28px -10px rgba(0,0,0,.55);transform:translateY(180%);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s,bottom .35s,background-color .6s,color .6s}
+.to-top.show{transform:none;opacity:1;pointer-events:auto}
+.to-top:hover svg{transform:translateY(-3px)}
+.to-top svg{transition:transform .25s}
+.has-player .to-top{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 .nav-now{display:inline-flex;align-items:center;gap:.6rem;font-size:.7rem;overflow:hidden}
 .nav-now .sw{width:.6rem;height:.6rem;border-radius:50%;background:var(--nav-accent);transition:background-color .6s;flex:none}
 .nav-now span{display:inline-block}
@@ -187,9 +192,12 @@ p{margin:0}
 .botanica-title{font-weight:300;font-variation-settings:"wdth" 125,"wght" 300;letter-spacing:-.03em}
 .is-in .botanica-title{animation:sprout 1.6s cubic-bezier(.2,.8,.2,1) both}
 @keyframes sprout{from{font-variation-settings:"wdth" 62,"wght" 700}}
-.era--botanica .cover{transform:translateZ(24px) rotate(-2deg)}
-.era--botanica .sleeve:hover .cover{transform:translateZ(24px) rotate(0deg)}
-.era--botanica .cover{transition:transform .5s ease}
+.print{position:absolute;inset:0;transform:translateZ(24px) rotate(-2deg);transition:transform .5s ease}
+.print .cover{transform:none}
+.era--botanica .sleeve:hover .print{transform:translateZ(24px) rotate(0deg)}
+.leak{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 100% 0%, rgba(255,150,50,.55), transparent 45%),radial-gradient(circle at 0% 100%, rgba(255,90,60,.25), transparent 40%);mix-blend-mode:screen;animation:leak 7s ease-in-out infinite alternate}
+@keyframes leak{0%{opacity:.35}50%{opacity:.85}100%{opacity:.5}}
+.datestamp{position:absolute;right:6%;bottom:5%;font-family:var(--mono);font-weight:500;font-size:clamp(.72rem,1.5vw,1.05rem);letter-spacing:.06em;color:#ff8a2a;text-shadow:0 0 6px rgba(255,120,30,.9),0 0 1px #ffb070;pointer-events:none}
 .fx{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0}
 
 /* ---------- ROY ---------- */
@@ -404,6 +412,75 @@ p{margin:0}
 @keyframes walk{0%,16%{transform:translate(0,0) rotate(20deg)}24%,38%{transform:translate(-44px,22px) rotate(-60deg)}46%,60%{transform:translate(-100px,8px) rotate(-100deg)}68%,82%{transform:translate(-36px,-26px) rotate(40deg)}90%,100%{transform:translate(0,0) rotate(20deg)}}
 @media (max-width:560px){.ci{width:3.1rem;height:3.1rem}.ci svg{width:2rem;height:2rem}.cycle-list::before{top:1.55rem}.cycle-list b{font-size:.92rem}}
 
+/* ---------- BOTÁNICA: jardín, herbario y números en hoja ---------- */
+.garden{margin-top:clamp(40px,6vw,72px)}
+.garden-h{color:var(--muted);text-align:center;margin-bottom:.6rem}
+.garden-row{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:start}
+.garden-row li{display:grid;justify-items:center;padding-inline:.3rem}
+.sprout{display:block;width:min(104px,88%);transform-origin:50% 100%}
+.is-in .sprout{animation:grow 1.5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * .13s)}
+@keyframes grow{from{transform:scaleY(.12) scaleX(.5)}}
+.sprout svg{display:block;width:100%;height:auto;transform-origin:50% 100%;animation:sway 3.6s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -.7s)}
+@keyframes sway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+.garden-row li.is-playing .sprout svg{animation:dance .42s ease-in-out infinite alternate}
+@keyframes dance{from{transform:rotate(-9deg) scaleY(.95)}to{transform:rotate(9deg) scaleY(1.05)}}
+.clod{display:block;width:calc(100% + .6rem);height:16px;margin-top:-4px;background:radial-gradient(circle, rgba(0,0,0,.28) 1px, transparent 1.6px) 0 0 / 7px 7px,linear-gradient(#7a5b3a,#56402a)}
+.garden-row li:first-child .clod{border-radius:9px 0 0 9px}
+.garden-row li:last-child .clod{border-radius:0 9px 9px 0}
+.stake{position:relative;display:grid;gap:.15rem;width:100%;box-sizing:border-box;margin-top:-.35rem;padding:.55rem .45rem 1.05rem;background:#f5efdc;color:var(--moss);text-align:center;clip-path:polygon(0 0,100% 0,100% 80%,50% 100%,0 80%);transform:rotate(var(--t,-2deg));transition:background-color .2s,color .2s}
+.garden-row li:nth-child(even) .stake{--t:2.5deg}
+.stake b{font-family:var(--display);font-weight:750;font-variation-settings:"wdth" 84,"wght" 750;font-size:clamp(.7rem,1.25vw,.95rem);line-height:1.15;overflow-wrap:anywhere}
+.stake .mono{font-size:.58rem;color:#6a7f60}
+.has-audio .stake{cursor:pointer}
+.has-audio .stake:hover{background:#fff}
+.stake:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.garden-row li.is-playing .stake{background:var(--sky);color:#fff}
+.garden-row li.is-playing .stake .mono{color:#dbe6ff}
+.herb{position:relative;display:grid;grid-template-columns:78px minmax(0,1fr);gap:1rem;align-items:start;margin-top:.6rem;padding:1.1rem 1.1rem 1.2rem;background:#f6f1e1;color:#2b3a24;border:1px solid rgba(27,52,24,.22);box-shadow:0 16px 28px -18px rgba(27,52,24,.55);transform:rotate(.6deg)}
+.herb::before,.herb::after{content:"";position:absolute;width:64px;height:20px;background:rgba(255,255,255,.55);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.herb::before{top:-9px;left:14px;transform:rotate(-8deg)}
+.herb::after{bottom:-8px;right:22px;transform:rotate(6deg)}
+.herb-leaf svg{display:block;width:100%;height:auto}
+.herb-h{color:#6a7f60;font-size:.6rem;margin-bottom:.55rem}
+.herb dl{margin:0;display:grid;gap:.3rem}
+.herb dl div{display:grid;grid-template-columns:5.6rem minmax(0,1fr);gap:.5rem;border-bottom:1px dotted rgba(27,52,24,.3);padding-bottom:.28rem}
+.herb dt{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:#6a7f60;padding-top:.2rem}
+.herb dd{margin:0;font-family:"EB Garamond",Georgia,serif;font-size:1.02rem;line-height:1.3}
+.herb-h{padding-right:64px}
+.herb-stamp{position:absolute;right:.6rem;top:.5rem;width:66px;height:66px;color:rgba(42,95,196,.5);transform:rotate(-14deg);pointer-events:none}
+.era--botanica .trk-n .num{display:inline-grid;place-items:center;width:2.2rem;height:2.2rem;margin:-.55rem 0 -.55rem -.35rem;font-size:.72rem;color:var(--moss);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M5 35 C5 16 18 5 35 5 C35 24 24 35 5 35 Z' fill='%23b9d39c'/%3E%3Cpath d='M8 32 L30 10' stroke='%237fa266' stroke-width='1.3' fill='none'/%3E%3C/svg%3E") center / contain no-repeat}
+.era--botanica .play .num{margin:0}
+.era--botanica .trk:hover .num{transform:rotate(-12deg)}
+@media (max-width:560px){.herb{grid-template-columns:56px minmax(0,1fr)}.herb dl div{grid-template-columns:minmax(0,1fr);gap:0}.garden-row li{padding-inline:.15rem}.stake{padding-inline:.25rem}}
+
+/* ---------- ATP: sencillos en línea de tiempo ---------- */
+.singles-line{list-style:none;margin:1.6rem 0 0;padding:0;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:1.8rem .9rem}
+.single{position:relative;display:grid;align-content:start;gap:.45rem;padding-top:1.7rem}
+.single::before{content:"";position:absolute;left:-.45rem;right:-.45rem;top:.45rem;height:2px;background:var(--rust)}
+.single::after{content:"";position:absolute;left:0;top:.08rem;width:.8rem;height:.8rem;box-sizing:border-box;border-radius:50%;background:var(--tang);border:2px solid var(--rust)}
+.s-date{position:absolute;top:.05rem;left:1rem;padding:0 .3rem;background:var(--tang);font-size:.6rem;color:var(--fg)}
+.s-cover{position:relative}
+.s-cover img{width:100%;aspect-ratio:1;object-fit:cover;box-shadow:0 12px 24px -12px rgba(26,11,2,.6);transition:transform .45s cubic-bezier(.2,.8,.2,1),outline-color .2s}
+.single:nth-child(odd) .s-cover:hover img{transform:translateY(-6px) rotate(-2deg)}
+.single:nth-child(even) .s-cover:hover img{transform:translateY(-6px) rotate(2deg)}
+.s-pi{position:absolute;right:.45rem;bottom:.45rem;width:2rem;height:2rem;border-radius:50%;background:var(--rust);color:var(--tang);display:grid;place-items:center;opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s;pointer-events:none}
+.has-audio .s-cover{cursor:pointer}
+.has-audio .single:hover .s-pi,.single.is-playing .s-pi{opacity:1;transform:none}
+.single b{font-family:var(--display);font-weight:800;font-variation-settings:"wdth" 82,"wght" 800;font-size:.98rem;line-height:1.15;overflow-wrap:break-word}
+.s-type{font-size:.58rem;color:var(--muted)}
+.single.is-album::after{background:var(--rust);width:1rem;height:1rem;top:0}
+.single.is-album .s-cover img{outline:3px solid var(--rust);outline-offset:3px}
+.single.is-album b{font-size:1.25rem}
+.s-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.15rem}
+.chip{font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.32rem .55rem;border-radius:999px;border:1px solid var(--line);background:color-mix(in srgb, var(--fg) 8%, transparent);color:var(--fg);cursor:pointer;transition:background-color .2s,color .2s}
+.chip:hover{background:color-mix(in srgb, var(--fg) 18%, transparent)}
+.chip.is-on{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.era--atp .chip.is-on{background:var(--rust);color:var(--tang)}
+.single.is-playing .s-cover img,.around figure.is-playing img{outline:3px solid var(--accent);outline-offset:3px}
+.has-audio .around figure > img{cursor:pointer}
+@media (max-width:900px){.singles-line{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:560px){.singles-line{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.8rem 1.1rem}}
+
 /* ---------- música: muestras de 30 s ---------- */
 [hidden]{display:none!important}
 html:not(.has-audio) .audio-only{display:none!important}
@@ -489,7 +566,7 @@ html:not(.has-audio) .audio-only{display:none!important}
 
 <div class="eras-nav">
   <div class="wrap nav-inner">
-    <span class="nav-mark">NSQK</span>
+    <button class="nav-mark" type="button" data-top aria-label="Volver al inicio">NSQK</button>
     <span class="nav-now mono" id="navNow"><i class="sw"></i><span id="navNowText">4 eras · 2020–2026</span></span>
   </div>
   <div class="nav-progress" aria-hidden="true">
@@ -542,6 +619,7 @@ html:not(.has-audio) .audio-only{display:none!important}
 <!-- ====================== BOTÁNICA ====================== -->
 <section class="era era--botanica" id="botanica" aria-labelledby="t-botanica">
   <canvas class="fx" id="vines" aria-hidden="true"></canvas>
+  <canvas class="fx" id="seeds" aria-hidden="true"></canvas>
   <div class="wrap era-inner">
     <div class="era-top">
       <p class="era-index mono">Era 1 de 4 · enero 2020</p>
@@ -554,12 +632,26 @@ html:not(.has-audio) .audio-only{display:none!important}
         <div><dt>Duración</dt><dd data-runtime="botanica">15:30</dd></div>
       </dl>
     </div>
+    <div class="garden">
+      <p class="garden-h mono">El jardín · una planta por canción<span class="audio-only"> · toca una estaca para escucharla</span></p>
+      <ol class="garden-row">
+        <li style="--i:0"><span class="sprout" aria-hidden="true"><svg viewBox="0 0 80 110"><path d="M40 110 C40 96 41 80 40 62" stroke="#7a5a3a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M40 76 L30 66 M40 70 L50 61" stroke="#7a5a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="40" cy="42" r="22" fill="#5e8f45"/><circle cx="25" cy="54" r="14" fill="#6e9f52"/><circle cx="56" cy="52" r="14" fill="#6e9f52"/><circle cx="46" cy="32" r="12" fill="#78a85a"/><circle cx="30" cy="46" r="4" fill="#d9473b"/><circle cx="51" cy="40" r="4" fill="#d9473b"/><circle cx="44" cy="58" r="4" fill="#d9473b"/><circle cx="22" cy="58" r="3.5" fill="#d9473b"/></svg></span><span class="clod" aria-hidden="true"></span><span class="stake"><span class="mono">01</span><b>Árbol De Manzanas</b></span></li>
+        <li style="--i:1"><span class="sprout" aria-hidden="true"><svg viewBox="0 0 80 110"><path d="M40 110 C38 92 42 76 40 58" stroke="#4f7d3f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 60 C30 44 14 44 8 50 C16 62 32 64 40 60 Z" fill="#6fa34f"/><path d="M40 60 C48 40 66 36 74 42 C68 58 50 64 40 60 Z" fill="#82b45f"/><path d="M40 60 C30 53 20 50 12 50 M40 60 C50 48 62 42 70 43" stroke="#4f7d3f" stroke-width="1" fill="none" opacity=".6"/></svg></span><span class="clod" aria-hidden="true"></span><span class="stake"><span class="mono">02</span><b>309</b></span></li>
+        <li style="--i:2"><span class="sprout" aria-hidden="true"><svg viewBox="0 0 80 110"><path d="M40 110 C42 92 38 70 40 40" stroke="#4f7d3f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 88 C30 80 22 82 18 86 C24 94 34 94 40 88 Z" fill="#6fa34f"/><path d="M40 74 C50 66 58 68 62 72 C56 80 46 80 40 74 Z" fill="#82b45f"/><g fill="#e2ad35"><ellipse cx="40" cy="25" rx="6" ry="11"/><ellipse cx="40" cy="25" rx="6" ry="11" transform="rotate(60 40 36)"/><ellipse cx="40" cy="25" rx="6" ry="11" transform="rotate(120 40 36)"/><ellipse cx="40" cy="25" rx="6" ry="11" transform="rotate(180 40 36)"/><ellipse cx="40" cy="25" rx="6" ry="11" transform="rotate(240 40 36)"/><ellipse cx="40" cy="25" rx="6" ry="11" transform="rotate(300 40 36)"/></g><circle cx="40" cy="36" r="6.5" fill="#8a5a2b"/></svg></span><span class="clod" aria-hidden="true"></span><span class="stake"><span class="mono">03</span><b>De Vez en Cuando (Aparece)</b></span></li>
+        <li style="--i:3"><span class="sprout" aria-hidden="true"><svg viewBox="0 0 80 110"><path d="M40 110 C37 90 44 64 40 40" stroke="#4f7d3f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M41 70 C46 62 52 58 56 56" stroke="#4f7d3f" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M40 90 C30 84 24 86 20 90 C26 98 36 96 40 90 Z" fill="#6fa34f"/><g fill="#2a5fc4"><circle cx="40" cy="26" r="7"/><circle cx="47.6" cy="31.5" r="7"/><circle cx="44.7" cy="40.5" r="7"/><circle cx="35.3" cy="40.5" r="7"/><circle cx="32.4" cy="31.5" r="7"/></g><circle cx="40" cy="34" r="4" fill="#f4e9c4"/><circle cx="58" cy="54" r="5" fill="#4a7fe0"/></svg></span><span class="clod" aria-hidden="true"></span><span class="stake"><span class="mono">04</span><b>Tonos de Azul</b></span></li>
+        <li style="--i:4"><span class="sprout" aria-hidden="true"><svg viewBox="0 0 80 110"><ellipse cx="40" cy="86" rx="14" ry="22" fill="#4f8a3c"/><ellipse cx="27" cy="56" rx="10" ry="15" transform="rotate(-24 27 56)" fill="#5e9a48"/><ellipse cx="53" cy="54" rx="10" ry="15" transform="rotate(22 53 54)" fill="#5e9a48"/><ellipse cx="58" cy="37" rx="5" ry="6" fill="#d94b7a"/><g fill="#eef4dc"><circle cx="36" cy="80" r=".9"/><circle cx="45" cy="92" r=".9"/><circle cx="41" cy="70" r=".9"/><circle cx="34" cy="96" r=".9"/><circle cx="29" cy="52" r=".9"/><circle cx="24" cy="62" r=".9"/><circle cx="52" cy="50" r=".9"/><circle cx="56" cy="61" r=".9"/></g></svg></span><span class="clod" aria-hidden="true"></span><span class="stake"><span class="mono">05</span><b>¿Pa Qué La Hacemos De Pedo?</b></span></li>
+      </ol>
+    </div>
     <div class="era-grid">
       <figure class="sleeve-wrap">
         <div class="sleeve">
           <div class="sleeve-3d">
             <div class="vinyl"><div class="disc"><span class="label" style="background-image:url('img/botanica.jpg')"></span></div></div>
-            <img class="cover" src="img/botanica.jpg" alt="Portada de Botánica: foto casera de un niño a medio salto en un patio con juegos infantiles" width="560" height="560" loading="lazy">
+            <div class="print">
+              <img class="cover" src="img/botanica.jpg" alt="Portada de Botánica: foto casera de un niño a medio salto en un patio con juegos infantiles" width="560" height="560" loading="lazy">
+              <span class="leak" aria-hidden="true"></span>
+              <span class="datestamp" aria-hidden="true">'20 1 31</span>
+            </div>
           </div>
         </div>
         <figcaption>La portada es una foto casera: un niño a medio salto en un patio con resbaladilla. Cálida y doméstica, como el disco.</figcaption>
@@ -569,6 +661,21 @@ html:not(.has-audio) .audio-only{display:none!important}
         <p>Salió el 31 de enero de 2020, unas semanas antes del encierro, bajo No Pedí Permiso. Suena cálido y limpio: pop, rap y R&amp;B con restos de la electrónica con la que aprendió a producir. Sus referencias eran Tyler, The Creator, Mac Miller y Radiohead, y del rock tomó estructuras y alguna guitarra.</p>
         <p>Para julio de 2020 ya pasaba del millón de reproducciones y lo puso en la conversación de la música mexicana. En esa época ya avisaba que lo siguiente iba a sonar más sucio y con más rock. Hoy dice que no se identifica del todo con Botánica, pero lo valora.</p>
         <blockquote class="quote">Tengo mucha hambre, y eso apenas comienza.» <cite>Nsqk, julio de 2020</cite></blockquote>
+        <div class="herb">
+          <span class="herb-leaf" aria-hidden="true"><svg viewBox="0 0 80 150"><path d="M40 148 C38 110 44 60 40 6" stroke="#4f6a3f" stroke-width="1.6" fill="none"/><g fill="rgba(79,110,60,.78)"><ellipse cx="26" cy="128" rx="13" ry="3.6" transform="rotate(-22 40 128)"/><ellipse cx="54" cy="128" rx="13" ry="3.6" transform="rotate(22 40 128)"/><ellipse cx="27.5" cy="112" rx="12.5" ry="3.6" transform="rotate(-22 40 112)"/><ellipse cx="52.5" cy="112" rx="12.5" ry="3.6" transform="rotate(22 40 112)"/><ellipse cx="28.5" cy="96" rx="11.5" ry="3.5" transform="rotate(-22 40 96)"/><ellipse cx="51.5" cy="96" rx="11.5" ry="3.5" transform="rotate(22 40 96)"/><ellipse cx="29.5" cy="80" rx="10.5" ry="3.4" transform="rotate(-22 40 80)"/><ellipse cx="50.5" cy="80" rx="10.5" ry="3.4" transform="rotate(22 40 80)"/><ellipse cx="31" cy="64" rx="9" ry="3.2" transform="rotate(-22 40 64)"/><ellipse cx="49" cy="64" rx="9" ry="3.2" transform="rotate(22 40 64)"/><ellipse cx="32.5" cy="50" rx="7.5" ry="3" transform="rotate(-22 40 50)"/><ellipse cx="47.5" cy="50" rx="7.5" ry="3" transform="rotate(22 40 50)"/><ellipse cx="34" cy="37" rx="6" ry="2.7" transform="rotate(-22 40 37)"/><ellipse cx="46" cy="37" rx="6" ry="2.7" transform="rotate(22 40 37)"/><ellipse cx="35.5" cy="25" rx="4.5" ry="2.4" transform="rotate(-22 40 25)"/><ellipse cx="44.5" cy="25" rx="4.5" ry="2.4" transform="rotate(22 40 25)"/><ellipse cx="37" cy="15" rx="3" ry="2" transform="rotate(-22 40 15)"/><ellipse cx="43" cy="15" rx="3" ry="2" transform="rotate(22 40 15)"/></g></svg></span>
+          <div>
+            <p class="herb-h mono">Ficha de herbario · ejemplar n.º 1</p>
+            <dl>
+              <div><dt>Ejemplar</dt><dd><i>Botánica</i>, EP</dd></div>
+              <div><dt>Colecta</dt><dd>31 de enero de 2020</dd></div>
+              <div><dt>Localidad</dt><dd>Monterrey, Nuevo León</dd></div>
+              <div><dt>Colector</dt><dd>R. Torres de la Garza</dd></div>
+              <div><dt>Contenido</dt><dd>5 canciones · 15:30</dd></div>
+              <div><dt>Notas</dt><dd>Escrito, producido y cantado por él solo</dd></div>
+            </dl>
+          </div>
+          <svg class="herb-stamp" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="herbPath" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs><circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="60" cy="60" r="31" fill="none" stroke="currentColor" stroke-width="1.2"/><text font-family="IBM Plex Mono, monospace" font-size="10" font-weight="500" fill="currentColor"><textPath href="#herbPath" textLength="272" lengthAdjust="spacing">NO PEDÍ PERMISO · MTY · 2020 ·</textPath></text><text x="60" y="67" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="900" font-size="20" fill="currentColor">NPP</text></svg>
+        </div>
         <div class="aside-card">
           <img src="img/braille.jpg" alt="Portada de Braille: dos figuras desnudas pintadas bailando sobre pasto verde y cielo azul" width="96" height="96" loading="lazy">
           <p><span class="mono">Lo que siguió · 2021</span><b>Braille</b>, un EP en dupla con Méne que los llevó a tocar en varias ciudades del país.</p>
@@ -671,9 +778,9 @@ html:not(.has-audio) .audio-only{display:none!important}
       <h3>Alrededor de ROY</h3>
       <p class="sub">El sencillo que lo abrió, el que tuvo segunda vida y el disco en vivo, donde algunas versiones le gustan más que las de estudio.</p>
       <div class="around-grid">
-        <figure><img src="img/cuandomevaya.jpg" alt="Portada de Cuando Me Vaya: Nsqk sentado en un sillón de una sala antigua con luz cálida" width="420" height="420" loading="lazy"><figcaption><b>Cuando Me Vaya</b><span class="mono">Sencillo · sep 2022</span><span>El primer adelanto, y la canción más personal del disco.</span></figcaption></figure>
-        <figure><img src="img/corazon.jpg" alt="Portada de Corazón : Classics en rojo, blanco y negro con tipografía grande" width="420" height="420" loading="lazy"><figcaption><b>Corazón : Classics</b><span class="mono">Sencillo · mar 2023</span><span>Con el disco ya afuera, salió por separado con portada propia.</span></figcaption></figure>
-        <figure><img src="img/royenvivo.jpg" alt="Portada de ROY EN VIVO 2023: retrato en rojo y negro de Nsqk con gorro, tapándose la cara con las manos" width="420" height="420" loading="lazy"><figcaption><b>ROY EN VIVO 2023</b><span class="mono">Álbum en vivo · sep 2023</span><span>17 temas grabados en directo.</span></figcaption></figure>
+        <figure><img src="img/cuandomevaya.jpg" alt="Portada de Cuando Me Vaya: Nsqk sentado en un sillón de una sala antigua con luz cálida" width="420" height="420" loading="lazy"><figcaption><b>Cuando Me Vaya</b><span class="mono">Sencillo · sep 2022</span><span>El primer adelanto, y la canción más personal del disco.</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="roy:1" aria-label="Escuchar 30 segundos de Cuando Me Vaya">▶ Escuchar</button></span></figcaption></figure>
+        <figure><img src="img/corazon.jpg" alt="Portada de Corazón : Classics en rojo, blanco y negro con tipografía grande" width="420" height="420" loading="lazy"><figcaption><b>Corazón : Classics</b><span class="mono">Sencillo · mar 2023</span><span>Con el disco ya afuera, salió por separado con portada propia.</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="roy:8" aria-label="Escuchar 30 segundos de Corazón : Classics">▶ Escuchar</button></span></figcaption></figure>
+        <figure><img src="img/royenvivo.jpg" alt="Portada de ROY EN VIVO 2023: retrato en rojo y negro de Nsqk con gorro, tapándose la cara con las manos" width="420" height="420" loading="lazy"><figcaption><b>ROY EN VIVO 2023</b><span class="mono">Álbum en vivo · sep 2023</span><span>17 temas grabados en directo.</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="x:8" aria-label="Escuchar 30 segundos de Cuando Me Vaya en vivo">▶ Cuando me vaya, en vivo</button></span></figcaption></figure>
       </div>
     </div>
   </div>
@@ -793,13 +900,17 @@ html:not(.has-audio) .audio-only{display:none!important}
 
     <div class="around">
       <h3>Do you think about me?</h3>
-      <p class="sub">Los sencillos que prepararon la pregunta, el adelanto que dividió a su público y el que cerró la era.</p>
-      <div class="around-grid c4">
-        <figure><img src="img/lovelanguage.jpg" alt="Portada de LOVELANGUAGE: personaje azul brillante sobre fondo rosa con una flor" width="420" height="420" loading="lazy"><figcaption><b>LOVELANGUAGE</b><span class="mono">Sencillo · oct 2023</span><span>El primero con la frase sampleada.</span></figcaption></figure>
-        <figure><img src="img/sisifo.jpg" alt="Portada de SÍSIFO / NADIE MÁS!: corona de flores azules sobre fondo azul" width="420" height="420" loading="lazy"><figcaption><b>SÍSIFO / NADIE MÁS!</b><span class="mono">Sencillo doble · abr 2024</span><span>El mito de empezar de cero en cada disco.</span></figcaption></figure>
-        <figure><img src="img/misa.jpg" alt="Portada de misa: figura de un animal esquelético en naranja sobre fondo rojo oscuro" width="420" height="420" loading="lazy"><figcaption><b>misa</b><span class="mono">Adelanto · jul 2024</span><span>Corrido y ranchera sobre baterías de funk.</span></figcaption></figure>
-        <figure><img src="img/ugh.jpg" alt="Portada de UGH / OTROS LUGARES: foto en blanco y negro de un ring de box con una figura gigante caída" width="420" height="420" loading="lazy"><figcaption><b>UGH / OTROS LUGARES</b><span class="mono">Sencillo doble · dic 2024</span><span>El cierre de la era, con DrefQuila.</span></figcaption></figure>
-      </div>
+      <p class="sub">Los sencillos que prepararon la pregunta, el disco que la respondió y el que cerró la era.<span class="audio-only"> Toca una portada para escucharla.</span></p>
+      <ol class="singles-line">
+        <li class="single"><span class="s-date mono">oct 2023</span><div class="s-cover"><img src="img/lovelanguage.jpg" alt="Portada de LOVELANGUAGE: personaje azul brillante sobre fondo rosa con una flor" width="420" height="420" loading="lazy"><span class="s-pi audio-only" aria-hidden="true">▶</span></div><b>LOVELANGUAGE</b><span class="s-type mono">Sencillo · abrió la serie</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="x:0" aria-label="Escuchar 30 segundos de LOVELANGUAGE">▶ Escuchar</button></span></li>
+        <li class="single"><span class="s-date mono">dic 2023</span><div class="s-cover"><img src="img/cometierra.jpg" alt="Portada de COMETIERRA REMIX: caricatura de una flor azul y un conejo rosa entre cactus verdes" width="420" height="420" loading="lazy"><span class="s-pi audio-only" aria-hidden="true">▶</span></div><b>COMETIERRA REMIX</b><span class="s-type mono">Remix · con legallyrxx</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="x:1" aria-label="Escuchar 30 segundos de COMETIERRA REMIX">▶ Escuchar</button></span></li>
+        <li class="single"><span class="s-date mono">ene 2024</span><div class="s-cover"><img src="img/badintenciones.jpg" alt="Portada de BAD INTENCIONES: caricatura en blanco y negro con rayos de luz" width="420" height="420" loading="lazy"><span class="s-pi audio-only" aria-hidden="true">▶</span></div><b>BAD INTENCIONES</b><span class="s-type mono">Sencillo</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="x:2" aria-label="Escuchar 30 segundos de BAD INTENCIONES">▶ Escuchar</button></span></li>
+        <li class="single"><span class="s-date mono">feb 2024</span><div class="s-cover"><img src="img/sigoalpendiente.jpg" alt="Portada de SIGO AL PENDIENTE: un cupido caricaturesco con arco sobre fondo rosa" width="420" height="420" loading="lazy"><span class="s-pi audio-only" aria-hidden="true">▶</span></div><b>SIGO AL PENDIENTE</b><span class="s-type mono">Sencillo</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="x:3" aria-label="Escuchar 30 segundos de SIGO AL PENDIENTE">▶ Escuchar</button></span></li>
+        <li class="single"><span class="s-date mono">abr 2024</span><div class="s-cover"><img src="img/sisifo.jpg" alt="Portada de SÍSIFO / NADIE MÁS!: corona de flores azules sobre fondo azul" width="420" height="420" loading="lazy"><span class="s-pi audio-only" aria-hidden="true">▶</span></div><b>SÍSIFO / NADIE MÁS!</b><span class="s-type mono">Sencillo doble</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="x:4" aria-label="Escuchar 30 segundos de SÍSIFO">▶ Sísifo</button><button class="chip" type="button" data-play="x:5" aria-label="Escuchar 30 segundos de NADIE MÁS!">▶ Nadie más!</button></span></li>
+        <li class="single"><span class="s-date mono">jul 2024</span><div class="s-cover"><img src="img/misa.jpg" alt="Portada de misa: figura de un animal esquelético en naranja sobre fondo rojo oscuro" width="420" height="420" loading="lazy"><span class="s-pi audio-only" aria-hidden="true">▶</span></div><b>misa</b><span class="s-type mono">Adelanto del disco</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="atp:8" aria-label="Escuchar 30 segundos de misa">▶ Escuchar</button></span></li>
+        <li class="single is-album"><span class="s-date mono">ago 2024</span><div class="s-cover"><img src="img/atp.jpg" alt="Portada de ATP" width="560" height="560" loading="lazy"></div><b>ATP</b><span class="s-type mono">El disco · la respuesta</span></li>
+        <li class="single"><span class="s-date mono">dic 2024</span><div class="s-cover"><img src="img/ugh.jpg" alt="Portada de UGH / OTROS LUGARES: foto en blanco y negro de un ring de box con una figura gigante caída" width="420" height="420" loading="lazy"><span class="s-pi audio-only" aria-hidden="true">▶</span></div><b>UGH / OTROS LUGARES</b><span class="s-type mono">Cierre · con DrefQuila</span><span class="s-chips audio-only"><button class="chip" type="button" data-play="x:6" aria-label="Escuchar 30 segundos de UGH">▶ Ugh</button><button class="chip" type="button" data-play="x:7" aria-label="Escuchar 30 segundos de OTROS LUGARES">▶ Otros lugares</button></span></li>
+      </ol>
     </div>
   </div>
 </section>
@@ -911,6 +1022,8 @@ html:not(.has-audio) .audio-only{display:none!important}
     <p class="credits">Hecho por fans, sin fines comerciales. Portadas y arte de sus respectivos dueños (Nsqk, Honey, Worldwide Records, No Pedí Permiso). Foto de 2021 por CapitanTick3, dominio público (CC0), vía Wikimedia Commons. Lo que dice cada canción resume entrevistas, reseñas y análisis publicados; cuando no hay una lectura confiable de la letra, la ficha se queda en los datos.</p>
   </div>
 </footer>
+
+<button class="to-top" id="toTop" type="button" data-top aria-label="Volver al inicio"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Inicio</button>
 
 <div class="player" id="player" hidden>
   <img class="pl-cover" id="plCover" src="img/botanica.jpg" alt="" width="52" height="52">
@@ -1061,8 +1174,13 @@ function onScroll() {
   const a = eras[0].getBoundingClientRect().top + scrollY;
   const b = eras[eras.length - 1].getBoundingClientRect().bottom + scrollY;
   nav.style.setProperty('--p', clamp((scrollY + probe - a) / (b - a), 0, 1).toFixed(4));
+  $('#toTop').classList.toggle('show', scrollY > $('#top').offsetHeight * .8);
   scrollHooks.forEach(f => f());
 }
+document.addEventListener('click', e => {
+  if (!e.target.closest('[data-top]')) return;
+  window.scrollTo({top: 0, behavior: RM ? 'auto' : 'smooth'});
+});
 let ticking = false;
 addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; onScroll(); }); } }, {passive: true});
 
@@ -1210,7 +1328,59 @@ function vinesScroll() {
   if (Math.abs(p - lastP) > .002) { lastP = p; drawVines(p); }
 }
 scrollHooks.push(vinesScroll);
-onToggle.botanica = on => { if (on) { lastP = -1; vinesScroll(); } };
+/* ---------------- Botánica: semillas de diente de león ---------------- */
+const kCv = $('#seeds'), kctx = kCv.getContext('2d');
+let SW = 0, SH = 0;
+const seeds = [];
+const wind = {x: 0, y: 0, px: null, py: null, t: 0};
+function newSeed(anywhere) {
+  return {x: Math.random() * SW, y: anywhere ? Math.random() * SH : SH + 24, vx: 0, vy: -(10 + Math.random() * 16), r: (Math.random() - .5) * .8, vr: 0, s: .75 + Math.random() * .65, ph: Math.random() * 10};
+}
+function sizeSeeds() {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  SW = innerWidth; SH = innerHeight;
+  kCv.width = SW * dpr; kCv.height = SH * dpr; kctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (!seeds.length) for (let i = 0, n = SW < 700 ? 9 : 18; i < n; i++) seeds.push(newSeed(true));
+}
+function drawSeed(s) {
+  const c = kctx;
+  c.save(); c.translate(s.x, s.y); c.rotate(s.r); c.scale(s.s, s.s);
+  c.strokeStyle = 'rgba(70,98,58,.6)'; c.lineWidth = .9;
+  c.beginPath(); c.moveTo(0, 0); c.lineTo(0, 15); c.stroke();
+  c.fillStyle = 'rgba(96,74,44,.75)'; c.beginPath(); c.ellipse(0, 17, 1.4, 3, 0, 0, 6.283); c.fill();
+  for (const [col, w] of [['rgba(70,98,58,.28)', 1.8], ['rgba(255,255,255,.95)', .8]]) {
+    c.strokeStyle = col; c.lineWidth = w;
+    for (let k = 0; k < 11; k++) { const a = -Math.PI / 2 + (k - 5) * .27; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(a) * 11, Math.sin(a) * 11); c.stroke(); }
+  }
+  c.restore();
+}
+$('#botanica').addEventListener('pointermove', e => {
+  const now = performance.now();
+  if (wind.px !== null) { const dt = Math.max(16, now - wind.t) / 1000; wind.x = (e.clientX - wind.px) / dt; wind.y = (e.clientY - wind.py) / dt; }
+  wind.px = e.clientX; wind.py = e.clientY; wind.t = now;
+}, {passive: true});
+function seedsStep(dt, t) {
+  kctx.clearRect(0, 0, SW, SH);
+  seeds.forEach((s, i) => {
+    if (wind.px !== null) {
+      const d = Math.hypot(s.x - wind.px, s.y - wind.py);
+      if (d < 170) { const k = (1 - d / 170) * 2.6 * dt; s.vx += wind.x * k; s.vy += wind.y * k; s.vr += (Math.random() - .5) * 6 * k; }
+    }
+    s.vx += Math.sin(t / 1400 + s.ph) * 8 * dt;
+    s.vx *= Math.pow(.4, dt);
+    s.vy += (-(14 * s.s) - s.vy) * dt * .9;
+    s.x += s.vx * dt; s.y += s.vy * dt;
+    s.vr *= Math.pow(.3, dt); s.r += s.vr * dt; s.r *= Math.pow(.7, dt);
+    if (s.y < -40 || s.x < -50 || s.x > SW + 50 || s.y > SH + 60) { seeds[i] = newSeed(false); return; }
+    drawSeed(s);
+  });
+  wind.x *= .86; wind.y *= .86;
+}
+function staticSeeds() { kctx.clearRect(0, 0, SW, SH); seeds.forEach(drawSeed); }
+onToggle.botanica = on => {
+  if (on) { lastP = -1; vinesScroll(); if (RM) staticSeeds(); }
+  else kctx.clearRect(0, 0, SW, SH);
+};
 
 /* ---------------- ROY: grano + título con foto ---------------- */
 (function grain() {
@@ -1358,6 +1528,18 @@ const PREVIEWS = {
   atp: ["AudioPreview211/v4/da/6b/bb/da6bbb34-a562-55e9-8116-752351652626/mzaf_10020411549517079176.plus.aac.p.m4a","AudioPreview211/v4/7f/65/6b/7f656b01-6db4-ff8c-71c6-3f1bf1d7e24f/mzaf_7595635106781117107.plus.aac.p.m4a","AudioPreview221/v4/71/e6/e4/71e6e4bd-fc03-7696-a39c-2c832d4c339d/mzaf_14858547869928293205.plus.aac.p.m4a","AudioPreview211/v4/50/ce/1a/50ce1ac9-4cc5-8807-76df-96c5e3e6cde3/mzaf_15659450909952939831.plus.aac.p.m4a","AudioPreview221/v4/0a/1d/3e/0a1d3ebb-6665-9071-57d3-ff77f43057b5/mzaf_8377888535884061248.plus.aac.p.m4a","AudioPreview211/v4/ad/6f/cf/ad6fcff6-e3d4-d277-d73a-6febd5d89648/mzaf_3345312678358866386.plus.aac.p.m4a","AudioPreview221/v4/af/8a/14/af8a1493-aa03-c0a0-5b56-52a44fe3e8c5/mzaf_13669026282285385868.plus.aac.p.m4a","AudioPreview221/v4/12/15/a2/1215a238-1370-cbcb-62fb-5b38dbd81a24/mzaf_6965573523909336613.plus.aac.p.m4a","AudioPreview211/v4/f9/73/1f/f9731f27-41b5-7054-fc2c-8d9eb381945d/mzaf_5776991297625392480.plus.aac.p.m4a","AudioPreview211/v4/0c/dc/88/0cdc8889-2401-84b6-2b23-fe511787bdfe/mzaf_214239068038685770.plus.aac.p.m4a","AudioPreview211/v4/2a/c7/03/2ac703bc-37e6-4996-9a99-05b88556ca45/mzaf_10117645809075437588.plus.aac.p.m4a","AudioPreview211/v4/34/c0/07/34c00702-66a1-e6b2-1c63-94efdffdfde9/mzaf_14598337988915623542.plus.aac.p.m4a","AudioPreview221/v4/39/fa/1e/39fa1e89-3229-c4b5-bcb3-545aabc586b9/mzaf_6706871846731130593.plus.aac.p.m4a","AudioPreview211/v4/10/c7/cf/10c7cf30-f4f1-25a2-0cde-9932e314a3f5/mzaf_6028216157568517150.plus.aac.p.m4a","AudioPreview221/v4/78/c1/df/78c1df3b-2119-d166-7b28-969dd9ef211b/mzaf_13915061793540055009.plus.aac.p.m4a","AudioPreview221/v4/bf/b7/0b/bfb70b04-692a-da56-d0f1-8900497b51e5/mzaf_404615564875529405.plus.aac.p.m4a","AudioPreview221/v4/bf/47/3f/bf473f0c-00c0-3c13-6a67-9de94e533951/mzaf_580109203565100215.plus.aac.p.m4a"],
   mosca: ["AudioPreview221/v4/63/1c/d3/631cd37c-db99-0d1e-ffd1-9bb08c6f626f/mzaf_7087822967002747469.plus.aac.p.m4a","AudioPreview211/v4/28/fd/43/28fd43ed-cc1a-0896-2c66-5ca3da494b58/mzaf_6266736102118689990.plus.aac.p.m4a","AudioPreview221/v4/fe/25/76/fe2576af-8158-a8da-ef62-99f267990857/mzaf_11510053310359128977.plus.aac.p.m4a","AudioPreview221/v4/ad/df/62/addf6294-8daf-1650-287d-3d3b758f2d15/mzaf_7346929542249208961.plus.aac.p.m4a","AudioPreview221/v4/d1/d2/55/d1d255b4-2d94-0722-b933-b91c60362a16/mzaf_2105324170235176036.plus.aac.p.m4a","AudioPreview221/v4/e0/1a/ec/e01aecde-99ec-00de-561b-f4b6c6803c09/mzaf_26863507561659895.plus.aac.p.m4a","AudioPreview221/v4/be/51/8f/be518f6c-3d90-fa1f-14d3-cc7de57100d5/mzaf_3761370052670638915.plus.aac.p.m4a","AudioPreview221/v4/ef/e4/30/efe43072-23c5-d4a7-f589-3faf3b6f3e9e/mzaf_16423932863954870163.plus.aac.p.m4a","AudioPreview221/v4/72/ce/32/72ce3265-1b2f-8b27-8e4f-6391c8105325/mzaf_8380928652387898048.plus.aac.p.m4a","AudioPreview211/v4/51/1f/19/511f196a-747d-9d14-bea0-2c05bb92488b/mzaf_11917878914991754513.plus.aac.p.m4a","AudioPreview211/v4/f3/d0/98/f3d09815-d4e3-c8e1-b8e1-b6d3f06493e0/mzaf_683959178055163174.plus.aac.p.m4a","AudioPreview211/v4/a3/3d/61/a33d6168-be10-6457-dcee-4f79e22e8884/mzaf_1522526958931841999.plus.aac.p.m4a","AudioPreview221/v4/d6/c8/5c/d6c85c8c-6d0b-e366-5490-c3e332a23f62/mzaf_17258478122800267151.plus.aac.p.m4a","AudioPreview211/v4/99/fb/f3/99fbf317-5735-731e-c611-04623770f3ab/mzaf_1736626504599905112.plus.aac.p.m4a","AudioPreview211/v4/bd/18/77/bd1877a6-4682-c839-9f07-660807273c0e/mzaf_5801484089525312097.plus.aac.p.m4a","AudioPreview221/v4/ab/e6/e7/abe6e7da-22d7-c8a5-b5e3-e75b3380cb08/mzaf_7780050183355673570.plus.aac.p.m4a","AudioPreview221/v4/bf/1f/39/bf1f393d-ca3e-c251-0735-589a2f7b8442/mzaf_14146848002659348208.plus.aac.p.m4a"]
 };
+/* sencillos fuera de los discos (clave "x") */
+const EXTRA = [
+  {t: "LOVELANGUAGE", c: "lovelanguage", era: "atp", n: "Sencillo · era ATP", p: "AudioPreview221/v4/40/0c/4d/400c4dec-e47f-33a7-4851-0517a9dc4ae2/mzaf_11405584483925152345.plus.aac.p.m4a"},
+  {t: "COMETIERRA REMIX", c: "cometierra", era: "atp", n: "Con legallyrxx · era ATP", p: "AudioPreview221/v4/94/51/8b/94518b90-fd17-3094-bd9b-d6dc6a064b19/mzaf_5610533263776889993.plus.aac.p.m4a"},
+  {t: "BAD INTENCIONES", c: "badintenciones", era: "atp", n: "Sencillo · era ATP", p: "AudioPreview221/v4/c8/d5/d4/c8d5d447-d7e3-6fa5-0c4d-4454a332f3c0/mzaf_9631858115923815599.plus.aac.p.m4a"},
+  {t: "SIGO AL PENDIENTE", c: "sigoalpendiente", era: "atp", n: "Sencillo · era ATP", p: "AudioPreview221/v4/53/0e/07/530e07bf-45ef-f061-48d0-2c738ebbf4c5/mzaf_11593943467802298421.plus.aac.p.m4a"},
+  {t: "SÍSIFO", c: "sisifo", era: "atp", n: "SÍSIFO / NADIE MÁS! · era ATP", p: "AudioPreview221/v4/e9/f6/ea/e9f6ea00-5631-5f99-6ff9-6f1d56e8932f/mzaf_2887317942985035510.plus.aac.p.m4a"},
+  {t: "NADIE MÁS!", c: "sisifo", era: "atp", n: "SÍSIFO / NADIE MÁS! · era ATP", p: "AudioPreview221/v4/a5/31/84/a5318465-3b0e-e2ff-3422-a03b829d6646/mzaf_17932642361279761845.plus.aac.p.m4a"},
+  {t: "UGH", c: "ugh", era: "atp", n: "UGH / OTROS LUGARES · era ATP", p: "AudioPreview221/v4/cc/de/39/ccde3934-6476-8899-5168-4445816668ea/mzaf_1643757537027144757.plus.aac.p.m4a"},
+  {t: "OTROS LUGARES", c: "ugh", era: "atp", n: "Con DrefQuila · era ATP", p: "AudioPreview211/v4/56/68/45/566845b0-3817-f939-f84d-cdba59a19c54/mzaf_14072462047667821954.plus.aac.p.m4a"},
+  {t: "Cuando Me Vaya (en vivo)", c: "royenvivo", era: "roy", n: "ROY EN VIVO 2023", p: "AudioPreview211/v4/f6/42/59/f64259c1-500b-4cec-e683-9de4d6ff546f/mzaf_14233532229579031419.plus.aac.p.m4a"}
+];
 const ALBUM_NAME = {botanica: 'Botánica', roy: 'ROY', atp: 'ATP', mosca: 'mosca'};
 const ALBUM_COLOR = {botanica: '#b9d39c', roy: '#d83b2f', atp: '#ff6a13', mosca: '#ff5f9e'};
 const ICON = {
@@ -1369,6 +1551,10 @@ audio.preload = 'none';
 const player = $('#player'), plToggle = $('#plToggle');
 let audioOK = false, nowAlbum = null, nowIdx = -1, radioOn = false, stationTimer = 0, actx = null;
 const rowsOf = k => $$(`[data-tracks="${k}"] .trk`);
+function info(k, i) {
+  if (k === 'x') { const e = EXTRA[i]; return {t: e.t, p: e.p, cover: `img/${e.c}.jpg`, name: e.n, color: ALBUM_COLOR[e.era], era: e.era}; }
+  return {t: DATA[k][i].t, p: PREVIEWS[k][i], cover: `img/${k}.jpg`, name: ALBUM_NAME[k], color: ALBUM_COLOR[k], era: k};
+}
 
 function enableAudio() {
   audioOK = true;
@@ -1376,6 +1562,12 @@ function enableAudio() {
   ['botanica', 'roy', 'mosca'].forEach(k => rowsOf(k).forEach((li, i) => {
     $('.trk-n', li).innerHTML = `<button class="play" type="button" data-play="${k}:${i}" aria-label="Escuchar 30 segundos de ${esc(DATA[k][i].t)}"><span class="num">${pad(i + 1)}</span><span class="pi">${ICON.play}</span><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></button>`;
   }));
+  $$('.stake').forEach((s, i) => {
+    s.dataset.play = 'botanica:' + i;
+    s.setAttribute('role', 'button');
+    s.tabIndex = 0;
+    s.setAttribute('aria-label', 'Escuchar 30 segundos de ' + DATA.botanica[i].t);
+  });
 }
 fetch(PREVIEW_BASE + PREVIEWS.botanica[0], {method: 'HEAD', mode: 'no-cors', cache: 'no-store'}).then(enableAudio, () => {});
 
@@ -1397,8 +1589,9 @@ function play(k, i, force) {
   if (same && !force) { if (audio.paused) audio.play().catch(() => {}); else audio.pause(); return; }
   if (same && force) { if (audio.paused) audio.play().catch(() => {}); return; }
   nowAlbum = k; nowIdx = i;
-  audio.src = PREVIEW_BASE + PREVIEWS[k][i];
+  audio.src = PREVIEW_BASE + info(k, i).p;
   audio.play().catch(() => {});
+  if (k === 'atp' && +tuner.value !== i + 1) setStation(i + 1, true);
   paint();
 }
 function radioTune(n) {
@@ -1409,8 +1602,9 @@ function radioTune(n) {
 }
 function next() {
   if (!nowAlbum) return;
+  if (nowAlbum === 'x') { if (nowIdx < 7) play('x', nowIdx + 1, true); else audio.pause(); return; }
   const n = (nowIdx + 1) % PREVIEWS[nowAlbum].length;
-  if (nowAlbum === 'atp') { radioOn = true; setStation(n + 1); } else play(nowAlbum, n, true);
+  if (nowAlbum === 'atp' && radioOn) setStation(n + 1); else play(nowAlbum, n, true);
 }
 function paintRadio() {
   const live = radioOn && nowAlbum === 'atp' && !audio.paused;
@@ -1420,23 +1614,29 @@ function paintRadio() {
   pb.setAttribute('aria-pressed', String(live));
 }
 function paint() {
-  $$('.trk.is-playing').forEach(r => { r.classList.remove('is-playing', 'is-paused'); r.style.removeProperty('--pp'); });
-  $$('.era.is-playing').forEach(s => s.classList.remove('is-playing'));
+  $$('.is-playing').forEach(el => { if (el === player) return; el.classList.remove('is-playing', 'is-paused'); el.style.removeProperty('--pp'); });
+  $$('.chip.is-on').forEach(c => c.classList.remove('is-on'));
   const paused = audio.paused;
   $('#atp').classList.toggle('on-air', nowAlbum === 'atp' && !paused);
   paintRadio();
-  if (!nowAlbum) { player.hidden = true; document.documentElement.classList.remove('has-player'); return; }
-  const row = rowsOf(nowAlbum)[nowIdx];
-  if (row) { row.classList.add('is-playing'); row.classList.toggle('is-paused', paused); }
-  if (!paused) $('#' + nowAlbum).classList.add('is-playing');
-  const tr = DATA[nowAlbum][nowIdx];
+  if (!nowAlbum) { player.hidden = true; player.classList.remove('is-playing'); document.documentElement.classList.remove('has-player'); return; }
+  const hosts = new Set();
+  $$(`[data-play="${nowAlbum}:${nowIdx}"]`).forEach(b => {
+    if (b.classList.contains('chip')) b.classList.add('is-on');
+    const h = b.closest('li, figure');
+    if (h) hosts.add(h);
+  });
+  if (nowAlbum === 'atp' && rowsOf('atp')[nowIdx]) hosts.add(rowsOf('atp')[nowIdx]);
+  hosts.forEach(h => { h.classList.add('is-playing'); h.classList.toggle('is-paused', paused); });
+  const it = info(nowAlbum, nowIdx);
+  if (!paused) $('#' + it.era).classList.add('is-playing');
   player.hidden = false;
   document.documentElement.classList.add('has-player');
-  player.style.setProperty('--pc', ALBUM_COLOR[nowAlbum]);
+  player.style.setProperty('--pc', it.color);
   player.classList.toggle('is-playing', !paused);
-  $('#plCover').src = `img/${nowAlbum}.jpg`;
-  $('#plTitle').textContent = tr.t;
-  $('#plAlbum').textContent = `${ALBUM_NAME[nowAlbum]} · muestra de 30 s · Apple Music`;
+  $('#plCover').src = it.cover;
+  $('#plTitle').textContent = it.t;
+  $('#plAlbum').textContent = `${it.name} · muestra de 30 s · Apple Music`;
   plToggle.innerHTML = paused ? ICON.play : ICON.pause;
   plToggle.setAttribute('aria-label', paused ? 'Reproducir' : 'Pausar');
 }
@@ -1455,7 +1655,12 @@ document.addEventListener('click', e => {
   const pb = e.target.closest('[data-play]');
   const row = e.target.closest('.trk');
   if (pb) { const [k, i] = pb.dataset.play.split(':'); play(k, +i); return; }
+  const cov = e.target.closest('.s-cover, .around figure > img');
+  if (cov) { const host = cov.closest('li, figure'), b = host && $('[data-play]', host); if (b) b.click(); return; }
   if (row && !e.target.closest('a, button') && !row.closest('[data-tracks="atp"]')) { const b = $('[data-play]', row); if (b) b.click(); }
+});
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[role="button"][data-play]')) { e.preventDefault(); e.target.click(); }
 });
 $('#powerBtn').addEventListener('click', () => {
   const live = radioOn && nowAlbum === 'atp' && !audio.paused;
@@ -1479,7 +1684,7 @@ const cio = new IntersectionObserver(es => es.forEach(e => {
 $$('[data-count]').forEach(el => cio.observe(el));
 
 /* ---------------- arranque ---------------- */
-function resize() { buildVines(); lastP = -1; sizeFlies(); if (!flies.length) initFlies(); if (RM) { restFly(); if (visible.has('mosca')) staticFlies(); } onScroll(); }
+function resize() { buildVines(); sizeSeeds(); lastP = -1; sizeFlies(); if (!flies.length) initFlies(); if (RM) { restFly(); if (visible.has('mosca')) staticFlies(); } onScroll(); }
 let rz = 0;
 addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(resize, 120); });
 resize();
@@ -1490,6 +1695,7 @@ if (!RM) {
     const dt = Math.min(.05, (t - last) / 1000); last = t;
     if (visible.has('top')) { heroLetters(t); flyStep(dt, t); }
     if (visible.has('mosca')) fliesStep(dt, t);
+    if (visible.has('botanica')) seedsStep(dt, t);
     if (visible.has('roy')) spotStep(t);
     if (visible.has('roy') || visible.has('atp')) bandStep(); else lastSY = scrollY;
     requestAnimationFrame(loop);
